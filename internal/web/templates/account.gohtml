@@ -1,0 +1,77 @@
+{{define "account"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/style.css">
+    <title>Account</title>
+</head>
+<body>
+    <div class="parent">
+        <div class="wrapper-acc">
+            {{template "header" .}}
+            <div class="button-wrapper">
+                <div class="title">
+                    <h3>Navigation:</h3>
+                </div>
+                <div class="list">
+                    <a href="#my-data" class="submit-btn"><i class = "material-icons">manage_accounts</i><p>my account</p></a>
+                    <a href="#my-posts" class="submit-btn"><i class = "material-icons">manage_accounts</i><p>my posts</p></a>
+                    <a href="#my-comments" class="submit-btn"><i class = "material-icons">post_add</i><p>my comments</p></a>
+                    <a href="#rated-posts" class="submit-btn"><i class = "material-icons">post_add</i><p>liked posts</p></a>
+                    <a href="#rated-comments" class="submit-btn"><i class = "material-icons">post_add</i><p>liked comments</p></a>
+                </div>
+            </div>
+            <div class="content-wrapper-acc">
+                <div class="scroll user" id="my-data">
+                    {{template "account-user" .}}
+                </div>
+                <div class="scroll post" id="my-posts">
+                    <form action="{{.RatioLink}}" method="post">
+                        <input type="hidden" name="link" value="#my-posts">
+                        <input type="hidden" id="postID" name="post" value="">
+                        {{template "posts" .Posts}}
+                    </form>
+                </div>
+                <div class="scroll comment" id="my-comments">
+                    <form action="{{.RatioLink}}" method="post">
+                        <input type="hidden" name="link" value="#my-comments">
+                        <input type="hidden" id="commID" name="comment" value="">
+                        {{template "comments_with_title_post" .Comments}}
+                    </form>
+                </div>
+                <div class="scroll post-rated" id="rated-posts">
+                    <form action="{{.RatioLink}}" method="post">
+                        <input type="hidden" name="link" value="#rated-posts">
+                        <input type="hidden" id="postIDrated" name="post" value="">
+                        {{template "posts" .PostsRated}}
+                    </form>
+                </div>
+                <div class="scroll comment-rated" id="rated-comments">
+                    <form action="{{.RatioLink}}" method="post">
+                        <input type="hidden" name="link" value="#rated-comments">
+                        <input type="hidden" id="commIDrated" name="comment" value="">
+                        {{template "comments_with_title_post" .CommentsRated}}
+                    </form>
+                </div>
+            </div>
+            {{template "post_create" .}}
+            {{template "comment_create" .}}
+        </div>
+        {{template "footer"}}
+    </div>
+</body>
+<script>
+    console.log({{.Session}})
+    console.log({{.AllPost}})
+    function objectID(v) {
+        document.getElementById('postID').value = v
+        document.getElementById('commID').value = v
+        document.getElementById('postIDrated').value = v
+        document.getElementById('commIDrated').value = v
+        console.log(v)
+    }
+</script>
+</html>
+{{end}}

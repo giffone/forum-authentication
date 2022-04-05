@@ -1,0 +1,23 @@
+{{define "header"}}
+    <div class="logo-wrapper">
+        <a href="/" class="href-forum"><h1>Forum</h1></a>
+    </div>
+    <div class="head-wrapper">
+        <div class="login-logout">
+            {{if .Session}}
+                <a href="/logout" class="href log"><i class = "material-icons">logout</i><p>out</p></a>
+            {{else}}
+                <a href="/login" class="href log"><i class = "material-icons">login</i><p>in</p></a>
+            {{end}}
+        </div>
+        <div class="menu">
+            {{if .Session}}
+                <a href="/account" class="href acc"><i class = "material-icons">manage_accounts</i><p>acc</p></a>
+                <a href="#create-post" class="href acc"><i class = "material-icons">post_add</i><p>post</p></a>
+                {{if and (not .AllPost) (not .Acc)}}
+                    <a href="#create-comment" class="href acc"><i class = "material-icons">forum</i><p>comt</p></a>
+                {{end}}
+            {{end}}
+        </div>
+    </div>
+{{end}}

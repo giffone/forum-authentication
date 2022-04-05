@@ -1,0 +1,48 @@
+{{define "comments_post"}}
+    <div class="comments-wrapper">
+        {{range .}}
+            {{if ne .ID 0}}
+                <div class="title">
+                    <div><b>{{.Login}}</b>{{.Created | dateForum | printf " on %s" }}</div>
+                </div>
+                <div class="comment-text">{{.Body}}</div>
+                {{template "ratio" .}}
+                <div class="line-end"></div>
+            {{end}}
+        {{end}}
+    </div>
+{{end}}
+
+{{define "comments_with_title_post"}}
+    <div class="comments-wrapper">
+        {{range .}}
+            {{if ne .ID 0}}
+                <div class="post-wrapper">
+                    {{template "one_post_title" .Title}}
+                </div>
+                <div class="title">
+                    <div><b>{{.Login}}</b>{{.Created | dateForum | printf " on %s" }}</div>
+                </div>
+                <div class="comment-text">{{.Body}}</div>
+                {{template "ratio" .}}
+                <div class="line-end"></div>
+            {{end}}
+        {{end}}
+    </div>
+{{end}}
+
+{{define "comment_create"}}
+    <div id="create-comment">
+        <div class="post-wrapper-create">
+            <form action="/comment" method="post" class="form post">
+                <a href="#" class="close">&times;</a>
+                <h2>Create Comment</h2>
+                <div class="input-group">
+                    <input type="text" name="body text" id="body text" required>
+                    <label for="body text">text</label>
+                </div>
+                <input type="submit" value="Submit" class="submit-btn">
+            </form>
+        </div>
+    </div>
+{{end}}

@@ -1,0 +1,520 @@
+@import url("https://fonts.googleapis.com/css2?family=Raleway&display=swap");
+
+html {
+    overflow-y: scroll;
+}
+
+* {
+    font-family: 'Raleway', sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    color: darkslategrey;
+    /*border: 1px solid blue;*/
+}
+
+.parent {
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1000px;
+    height: 100vh;
+    flex-direction: column;
+}
+
+.wrapper {
+    flex: 1;
+    display: grid;
+    grid-template-areas:
+        'logo menu'
+        'content content';
+    grid-template-columns: 1fr 5fr;
+    grid-template-rows: 100px auto;
+}
+
+.wrapper-main {
+    flex: 1;
+    display: grid;
+    grid-template-areas:
+        'logo menu'
+        'category post';
+    grid-template-columns: 1fr 5fr;
+    grid-template-rows: 100px auto;
+}
+
+.wrapper-acc {
+    flex: 1;
+    display: grid;
+    grid-template-areas:
+        'logo menu'
+        'button content';
+    grid-template-columns: 1fr 5fr;
+    grid-template-rows: 100px auto;
+}
+
+.logo-wrapper {
+    grid-area: logo;
+    padding: .5rem;
+    background: gainsboro;
+}
+
+.head-wrapper {
+    grid-area: menu;
+    width: 100%;
+    padding: 1rem;
+}
+
+.category-wrapper {
+    grid-area: category;
+}
+
+.button-wrapper {
+    grid-area: button;
+}
+
+.content-wrapper {
+    grid-area: content;
+    margin-top: 0;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+.content-wrapper-acc {
+    height: 90vh;
+    width: 100%;
+    grid-area: content;
+    scroll-snap-type: x mandatory;
+    overflow-x: hidden;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+
+.scroll {
+    height: 100%;
+    width: 100%;
+    padding: 5px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.scroll.post,
+.scroll.comment,
+.scroll.post-rated,
+.scroll.comment-rated {
+    display: block;
+}
+
+.user-wrapper {
+    grid-area: post;
+}
+
+footer {
+    bottom: 0;
+    background: gainsboro;
+}
+
+.head-wrapper div {
+    height: 50%;
+}
+
+.button-wrapper,
+.category-wrapper .list {
+    display: flex;
+    flex-direction: column;
+}
+
+.button-wrapper div,
+.category-wrapper div,
+.category-wrapper .list-btn {
+    margin-bottom: 1.5rem;
+}
+
+.post-wrapper,
+.comments-wrapper,
+.category-wrapper {
+    overflow: hidden;
+}
+
+.post-wrapper .title,
+.comments-wrapper .title {
+    grid-column-gap: 2px;
+}
+
+.post-wrapper .post-cat,
+.post-wrapper .ratio,
+.post-wrapper .title,
+.comments-wrapper .title {
+    display: flex;
+}
+
+.list-btn {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+}
+
+.links {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
+.post-cat,
+.post-wrapper .title,
+.post-wrapper .post-text,
+.post-wrapper .line,
+.comments-wrapper .comment-text,
+.comments-wrapper .line {
+    margin-bottom: .5rem;
+}
+
+.message,
+.post-wrapper .line-end,
+.comments-wrapper .line-end {
+    margin-bottom: 2rem;
+}
+
+.post-cat,
+.ratio,
+.post-wrapper .post-text,
+.comments-wrapper .comment-text {
+    padding: 0 .5rem 0 .5rem;
+    text-align: justify;
+    letter-spacing: .03rem;
+}
+
+.button-wrapper,
+.category-wrapper,
+.post-wrapper .post-text,
+.post-wrapper .title div,
+.post-wrapper .title .title-main,
+.comments-wrapper .comment-text,
+.comments-wrapper .title div {
+    padding: .5rem;
+}
+
+.post-wrapper .title .title-main {
+    background: gainsboro;
+    flex: 2;
+}
+
+.post-wrapper .title div,
+.comments-wrapper .title div {
+    flex: 1;
+    background: papayawhip;
+}
+
+.post-text {
+    border: 1px solid transparent;
+}
+
+.post-text.like {
+    background: #ebfaee;
+    border: 1px solid #92ff92;
+}
+
+.post-text.dislike {
+    background: #faebeb;
+    border: 1px solid #ffbbce;
+}
+
+.list-btn,
+.list-btn h4 {
+    color: olivedrab;
+}
+
+.login-wrapper,
+.message-wrapper {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: gainsboro;
+}
+
+.form h2,
+.submit-btn,
+.href {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.menu a {
+    margin-right: 10px;
+}
+
+.form {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    padding: 80px 40px 40px;
+    background: whitesmoke;
+    border-radius: 10px;
+}
+
+.href,
+.submit-btn,
+.form-message,
+.form {
+    border: 1px solid silver;
+}
+
+.form.acc {
+    border: none;
+    background: transparent;
+}
+
+.form.post {
+    min-width: 800px;
+}
+
+.form img {
+    position: absolute;
+    top: -50px;
+    left: calc(50% - 50px);
+    width: 100px;
+    border-radius: 50%;
+}
+
+.form h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.form .input-group {
+    position: relative;
+}
+
+.form .input-group input {
+    width: 100%;
+    padding: 10px 0;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    margin-bottom: 30px;
+    border: none;
+    outline: none;
+    background-color: transparent;
+}
+
+.post-wrapper .line,
+.form .input-group input {
+    border-bottom: 1px solid gainsboro;
+}
+
+.form .input-group label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px 0;
+    font-size: 1rem;
+    pointer-events: none;
+    transition: .3s ease-out;
+}
+
+.form .input-group input:focus + label,
+.form .input-group input:valid + label {
+    transform: translateY(-18px);
+    color: gray;
+    font-size: .8rem;
+}
+
+.login-logout {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.menu {
+    display: flex;
+    align-items: center;
+}
+
+.href {
+    border-color: darkcyan;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+    width: 60px;
+    display: flex;
+    align-items: center;
+}
+
+.href p {
+    font-size: 10px;
+}
+
+.material-icons {
+    font-size: 18px;
+    color: darkcyan;
+}
+
+.submit-btn {
+    outline: none;
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.submit-btn.confirm {
+    background: lightsalmon;
+}
+
+.submit-btn {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+}
+
+a,
+.close {
+    text-decoration: none;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}
+
+.submit-btn:focus,
+.href:focus,
+.links a:focus {
+    color: gray;
+}
+
+#signup,
+#forgot-pw,
+#create-post,
+#create-comment {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0;
+    z-index: -1;
+    opacity: 0;
+    transition: .6s;
+    background: gainsboro;
+}
+
+#signup:target,
+#forgot-pw:target,
+#create-post:target,
+#create-comment:target {
+    height: 100%;
+    opacity: 1;
+    z-index: 1;
+}
+
+.close {
+    position: absolute;
+    right: 1.5rem;
+    top: 0.5rem;
+    font-size: 2rem;
+    font-weight: 900;
+}
+
+.list-post,
+.ratio,
+.like,
+.dislike {
+    align-items: center;
+}
+
+.post-cat {
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.post-cat a {
+    margin-right: 10px;
+}
+
+.ratio {
+    display: flex;
+}
+
+.ratio .like {
+    display: flex;
+    flex-wrap: nowrap;
+    order: 1;
+    margin-right: 10px;
+}
+
+.ratio .dislike {
+    display: flex;
+    flex-wrap: nowrap;
+    order: 2;
+}
+
+.ratio .like span,
+.ratio .like .material-icons {
+    color: limegreen;
+    margin-right: 5px;
+}
+
+.ratio .dislike span,
+.ratio .dislike .material-icons {
+    color: red;
+    margin-right: 5px;
+}
+
+.body.text {
+    height: 200px;
+}
+
+h1 {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+h3 {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+h4 {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+@media (max-width:1024px) {
+    .wrapper-main {
+        display: block;
+    }
+
+    .category-wrapper div {
+        display: flex;
+        flex: auto;
+
+    }
+
+    .category-wrapper .list {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .category-wrapper .list a {
+        margin-right: 10px;
+    }
+}

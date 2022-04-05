@@ -1,0 +1,55 @@
+{{define "one_post"}}
+    <div class="post-text {{.Liked}}">{{.Body}}</div>
+{{end}}
+
+{{define "one_post_title"}}
+    <div class="title">
+        <a href="/read/?post={{.ID}}" class="title-main"><h3>{{.Title}}</h3></a>
+        {{if ne .Login ""}}
+            <div><b>{{.Login}}</b>{{.Created | dateForum | printf " on %s" }}</div>
+        {{else}}
+            <p>&nbsp;</p>
+        {{end}}
+    </div>
+{{end}}
+
+{{define "posts"}}
+    <div class="post-wrapper">
+        {{range .}}
+            {{template "one_post_title" .}}
+            {{template "one_post" .}}
+            <div class="line"></div>
+            {{template "categories_post" .}}
+            {{template "ratio" .}}
+            <div class="line-end"></div>
+        {{end}}
+    </div>
+{{end}}
+
+{{define "post_create"}}
+    <div id="create-post">
+        <div class="post-wrapper-create">
+            <form action="/post" method="post" class="form post">
+                <a href="#" class="close">&times;</a>
+                <h2>Create Post</h2>
+                <div class="input-group">
+                    <input type="text" name="title" id="title" required>
+                    <label for="title">title</label>
+                </div>
+                <div class="input-group">
+                    <input type="text" name="body text" id="body text" required>
+                    <label for="body text">text</label>
+                </div>
+                <div class="">
+                    {{range .Category}}
+                        <div class="cat-box">
+                            <input type="checkbox" name="categories" value="{{.ID}}" id="cat">
+                            <label for="cat">{{.Name}}</label>
+                        </div>
+                    {{end}}
+                </div>
+                <input type="submit" value="Submit" class="submit-btn">
+            </form>
+        </div>
+    </div>
+{{end}}

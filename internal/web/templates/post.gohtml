@@ -1,0 +1,43 @@
+{{define "post"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/style.css">
+    <title>Post</title>
+</head>
+<body>
+    <div class="parent">
+        <div class="wrapper">
+            {{template "header" .}}
+            <div class="content-wrapper">
+                <div>
+                    <form action="{{.RatioLink}}">
+                        <input type="hidden" id="postID" name="post" value="">
+                        {{template "posts" .Posts}}
+                    </form>
+                </div>
+                <div>
+                    <form action="{{.RatioLink}}">
+                        <input type="hidden" id="commID" name="comment" value="">
+                        {{template "comments_post" .Comments}}
+                    </form>
+                </div>
+            </div>
+            {{template "post_create" .}}
+            {{template "comment_create" .}}
+        </div>
+        {{template "footer"}}
+    </div>
+</body>
+<script>
+    function objectID(v) {
+        console.log({{.Session}})
+        console.log({{.AllPost}})
+        document.getElementById('postID').value = v
+        document.getElementById('commID').value = v
+    }
+</script>
+</html>
+{{end}}

@@ -1,0 +1,65 @@
+{{define "ratio"}}
+    <div class="ratio">
+        <h5>ratio:&nbsp;</h5>
+        {{$rated := .Liked}}
+        {{range .Likes}}
+            {{if $rated}}
+                {{if or (and (eq .Body "like") (eq $rated "like")) (and (eq .Body "dislike") (eq $rated "dislike"))}}
+                    {{template "like_no_border" .}}
+                {{else}}
+                    {{template "like_border" .}}
+                {{end}}
+            {{else}}
+                {{if eq .Count 0}}
+                    {{if and (.Session) (not .AllPost)}}
+                        {{template "btn_border" .}}
+                    {{else}}
+                        {{if eq .Like 0}}
+                            <span>{{.Body}}</span>
+                        {{else}}
+                            {{template "like_border" .}}
+                        {{end}}
+                    {{end}}
+                {{else}}
+                    {{template "like_border" .}}
+                {{end}}
+            {{end}}
+        {{end}}
+    </div>
+
+{{end}}
+
+{{define "like_border"}}
+    {{if and (.Session) (not .AllPost)}}
+        {{template "btn_border" .}}
+    {{else}}
+        {{template "txt_border" .}}
+    {{end}}
+{{end}}
+
+{{define "like_no_border"}}
+    {{if and (.Session) (not .AllPost)}}
+        {{template "btn_no_border" .}}
+    {{else if and (.Session) (.AllPost)}}
+        {{template "txt_no_border" .}}
+    {{else}}
+        {{template "txt_border" .}}
+    {{end}}
+{{end}}
+
+{{define "btn_no_border"}}
+    <button class="{{.Body}}" name="rate" value="{{.Body}}" onclick="objectID({{.PostOrComm}})"><span>{{.Count}}</span><i class = "material-icons">favorite</i></button>
+{{end}}
+
+{{define "btn_border"}}
+    <button class="{{.Body}}" name="rate" value="{{.Body}}" onclick="objectID({{.PostOrComm}})"><span>{{.Count}}</span><i class = "material-icons">favorite_border</i></button>
+{{end}}
+
+{{define "txt_no_border"}}
+    <div class="{{.Body}}"><span>{{.Count}}</span><i class = "material-icons">favorite</i></div>
+{{end}}
+
+{{define "txt_border"}}
+    <div class="{{.Body}}"><span>{{.Count}}</span><i class = "material-icons">favorite_border</i></div>
+{{end}}
+

@@ -1,0 +1,24 @@
+{{define "message"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <title>{{.StatusCode}}</title>
+</head>
+    <body>
+        <div class="message-wrapper">
+            <form action="" class="form message">
+                <h2>{{.StatusCode}}</h2>
+                <div class="message">{{.StatusBody}}</div>
+                <div class="links">
+                    <a href="/" class="submit-btn confirm">Main page</a>
+                    {{ if ne .Return ""}}
+                        <a href="{{.Return}}" class="submit-btn confirm">Return</a>
+                    {{end}}
+                </div>
+            </form>
+        </div>
+    </body>
+</html>
+{{end}}

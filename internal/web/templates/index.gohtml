@@ -1,0 +1,26 @@
+{{define "index"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/assets/css/style.css">
+    <title>Forum by GFaiz and DamirKap</title>
+</head>
+<body>
+    <div class="parent">
+        <div class="wrapper-main">
+            {{template "header" .}}
+            {{template "categories" .}}
+            {{template "posts" .Posts}}
+            {{template "post_create" .}}
+        </div>
+        {{template "footer"}}
+    </div>
+</body>
+<script>
+    console.log({{.Session}})
+    console.log({{.AllPost}})
+</script>
+</html>
+{{end}}
