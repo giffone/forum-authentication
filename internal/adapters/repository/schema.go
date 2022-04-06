@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"forum/internal/constant"
+	"github.com/giffone/forum-authentication/internal/constant"
 )
 
 // Configuration for save parameters
@@ -22,5 +22,3 @@ func MakeTables() []string {
 		constant.TabCommentsLikes,
 		constant.TabSessions}
 }
-
-

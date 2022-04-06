@@ -4,9 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"forum/internal/adapters/repository"
-	"forum/internal/adapters/repository/sqlitedb/schema"
-	"forum/internal/object"
+	"github.com/giffone/forum-authentication/internal/adapters/repository"
+	"github.com/giffone/forum-authentication/internal/adapters/repository/sqlitedb/schema"
+	"github.com/giffone/forum-authentication/internal/object"
 	"log"
 )
 

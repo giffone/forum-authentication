@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"forum/internal/constant"
-	"forum/internal/object"
+	"github.com/giffone/forum-authentication/internal/constant"
+	"github.com/giffone/forum-authentication/internal/object"
 	"log"
 )
 

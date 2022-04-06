@@ -12,81 +12,56 @@ import (
 )
 
 type sRatio struct {
-	repo     repository.Repo
-	sPost    service.Post
-	sComment service.Comment
+	repo        repository.Repo
+	sMiddleware service.Middleware
 }
 
-func NewService(repo repository.Repo) service.Ratio {
+func NewService(repo repository.Repo, sMiddleware service.Middleware) service.Ratio {
 	return &sRatio{
-		repo: repo,
+		repo:        repo,
+		sMiddleware: sMiddleware,
 	}
-}
-
-func (sr *sRatio) AddService(sPost service.Post, sComment service.Comment) {
-	sr.sPost = sPost
-	sr.sComment = sComment
 }
 
 func (sr *sRatio) Create(ctx context.Context, d *dto.Ratio) (int, object.Status) {
 	ctx2, cancel := context.WithTimeout(ctx, constant.TimeLimitDB)
 	defer cancel()
 
-	if d.Obj.Ck.PostString != "" {
-		// check postID valid (refer number)
-		idPost, sts := sr.sPost.Check(ctx, []string{d.Obj.Ck.PostString})
-		if sts != nil {
-			return 0, sts
-		}
-		if len(idPost) == 0 {
-			return 0, object.StatusByCode(constant.Code400)
-		}
-		d.Obj.Ck.Post = idPost[0]
-	}
-
-	like := model.NewLike(nil, d.Obj.Ck)
+	ratio := model.NewLike(nil, d.Obj.Ck)
 	post := false
 	// post
 	if id, ok := d.PostOrComm[constant.KeyPost]; ok {
 		post = true
 		// check id for valid
-		idPost, sts := sr.sPost.Check(ctx2, []string{id})
-
+		idPost, sts := sr.checkID(ctx2, constant.KeyPost, []string{id})
 		if sts != nil {
 			return 0, sts
 		}
-		if len(idPost) == 0 {
-			return 0, object.StatusByCode(constant.Code400)
-		}
 		// post - keys for get likes from db
-		like.MakeKeys(constant.KeyPost, d.Obj.Ck.User, idPost[0])
+		ratio.MakeKeys(constant.KeyPost, d.Obj.Ck.User, idPost)
 		// post - keys for create like in db
-		d.MakeKeys(constant.KeyPost, d.Obj.Ck.User, idPost[0])
+		d.MakeKeys(constant.KeyPost, d.Obj.Ck.User, idPost)
 		// comment
 	} else if id, ok := d.PostOrComm[constant.KeyComment]; ok {
 		// check id for valid
-		idComm, sts := sr.sComment.Check(ctx2, []string{id})
+		idComm, sts := sr.checkID(ctx2, constant.KeyComment, []string{id})
 		if sts != nil {
 			return 0, sts
 		}
-		if len(idComm) == 0 {
-			return 0, object.StatusByCode(constant.Code400)
-		}
-		// comment - keys for get likes from db
-		like.MakeKeys(constant.KeyComment, d.Obj.Ck.User, idComm[0])
+		ratio.MakeKeys(constant.KeyComment, d.Obj.Ck.User, idComm)
 		// comment - keys for create like in db
-		d.MakeKeys(constant.KeyComment, d.Obj.Ck.User, idComm[0])
+		d.MakeKeys(constant.KeyComment, d.Obj.Ck.User, idComm)
 	} else {
 		// if not post or comment
 		return 0, object.StatusByCode(constant.Code400)
 	}
 	//check like exist by user_id and post_id/comment_id
-	sts := sr.repo.GetOne(ctx2, like)
+	sts := sr.repo.GetOne(ctx2, ratio)
 	if sts != nil {
 		return 0, sts
 	}
 	// not exist
-	if like.PostOrComm == 0 {
+	if ratio.PostOrComm == 0 {
 		// keys - here need only key and ignore value [in DTO method create]
 		id, sts := sr.repo.Create(ctx2, d)
 		if sts != nil {
@@ -99,9 +74,9 @@ func (sr *sRatio) Create(ctx context.Context, d *dto.Ratio) (int, object.Status)
 	dDelete := dto.NewRatio(nil, nil, d.Obj.Ck)
 	// make keys for delete by id
 	if post {
-		dDelete.MakeKeys(constant.KeyPost, like.PostOrComm)
+		dDelete.MakeKeys(constant.KeyPost, ratio.PostOrComm)
 	} else {
-		dDelete.MakeKeys(constant.KeyComment, like.PostOrComm)
+		dDelete.MakeKeys(constant.KeyComment, ratio.PostOrComm)
 	}
 	// delete
 	sts = sr.repo.Delete(ctx2, dDelete)
@@ -109,7 +84,7 @@ func (sr *sRatio) Create(ctx context.Context, d *dto.Ratio) (int, object.Status)
 		return 0, sts
 	}
 	// is same - was like and new like (not create new)
-	if like.Like == d.Like {
+	if ratio.Ratio == d.Ratio {
 		// post_id for return page (redirect)
 		return d.Obj.Ck.Post, nil
 	}
@@ -125,7 +100,7 @@ func (sr *sRatio) Create(ctx context.Context, d *dto.Ratio) (int, object.Status)
 func (sr *sRatio) CountFor(ctx context.Context, pc model.PostOrComment) object.Status {
 	for i := 0; i < pc.LSlice(); i++ {
 		id := pc.PostOrCommentID(i)
-		likesCount := model.NewLikesCount(pc.Settings().ClearKey(), pc.Cookie()) // auto insert session
+		likesCount := model.NewLikesCount(pc.Settings().ClearKey(), pc.Cookie()) // auto insert middleware
 		likesCount.MakeKeys(pc.KeyRole(), id)
 		// for make map["post"]id
 		likesCount.PostOrComm = id
@@ -170,7 +145,7 @@ func (sr *sRatio) CountForChan(ctx context.Context, pc model.PostOrComment, chan
 	log.Println("in CountForChan")
 	for i := 0; i < pc.LSlice(); i++ {
 		id := pc.PostOrCommentID(i)
-		likesCount := model.NewLikesCount(pc.Settings().ClearKey(), pc.Cookie()) // auto insert session
+		likesCount := model.NewLikesCount(pc.Settings().ClearKey(), pc.Cookie()) // auto insert middleware
 		likesCount.MakeKeys(pc.KeyRole(), id)
 		// for make map["post"]id
 		likesCount.PostOrComm = id
@@ -216,4 +191,13 @@ func (sr *sRatio) LikedChan(ctx context.Context, pc model.PostOrComment, channel
 	}
 	log.Println("out LikedChan")
 	channel <- nil
+}
+
+func (sr *sRatio) checkID(ctx context.Context, postOrComm string, slice []string) (int, object.Status) {
+	id := dto.NewCheckID(postOrComm, slice)
+	ids, sts := sr.sMiddleware.Check(ctx, id)
+	if sts != nil {
+		return 0, sts
+	}
+	return ids[0], nil
 }

@@ -14,7 +14,7 @@ const (
 
 type Ratio struct {
 	PostOrComm map[string]string // post or comment - map[post]id
-	Like       int               // like/dislike
+	Ratio      int               // like/dislike
 	Obj        object.Obj
 }
 
@@ -28,9 +28,9 @@ func (r *Ratio) AddByPOST(request *http.Request) bool {
 	// ratio - like/dislike
 	rate := request.PostFormValue(constant.KeyRate)
 	if rate == constant.KeyLike {
-		r.Like = like
+		r.Ratio = like
 	} else if rate == constant.KeyDislike {
-		r.Like = dislike
+		r.Ratio = dislike
 	} else {
 		r.Obj.Sts.StatusByCodeAndLog(constant.Code400,
 			nil, "dto: like: postFormValue is nil")
@@ -65,9 +65,9 @@ func (r *Ratio) AddByGET(request *http.Request) bool {
 	// ratio - like/dislike
 	rate := u.Get(constant.KeyRate)
 	if rate == constant.KeyLike {
-		r.Like = like
+		r.Ratio = like
 	} else if rate == constant.KeyDislike {
-		r.Like = dislike
+		r.Ratio = dislike
 	} else {
 		r.Obj.Sts.StatusByCodeAndLog(constant.Code400,
 			nil, "dto: like: postFormValue is nil")
@@ -113,7 +113,7 @@ func (r *Ratio) Create() *object.QuerySettings {
 		qs.Fields = []interface{}{
 			r.Obj.Ck.User,
 			r.PostOrComm[constant.KeyPost],
-			r.Like,
+			r.Ratio,
 			time.Now(),
 		}
 	} else {
@@ -127,7 +127,7 @@ func (r *Ratio) Create() *object.QuerySettings {
 		qs.Fields = []interface{}{
 			r.Obj.Ck.User,
 			r.PostOrComm[constant.KeyComment],
-			r.Like,
+			r.Ratio,
 			time.Now(),
 		}
 	}

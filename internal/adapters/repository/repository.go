@@ -3,10 +3,10 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"forum/internal/constant"
-	"forum/internal/object"
-	"forum/internal/object/dto"
-	"forum/internal/object/model"
+	"github.com/giffone/forum-authentication/internal/constant"
+	"github.com/giffone/forum-authentication/internal/object"
+	"github.com/giffone/forum-authentication/internal/object/dto"
+	"github.com/giffone/forum-authentication/internal/object/model"
 )
 
 type repo struct {
@@ -27,12 +27,18 @@ func (r *repo) Create(ctx context.Context, d dto.DTO) (int, object.Status) {
 	// prepare query for db
 	q := d.Create().MakeQuery(r.schema)
 
-	// apply query
-	res, err := r.db.ExecContext(ctx, q.Query, q.Fields...)
+	stmt, err := r.db.PrepareContext(ctx, q.Query)
 	if err != nil {
 		return 0,
 			object.StatusByCodeAndLog(constant.Code500,
-				err, "create")
+				err, "create: stmt:")
+	}
+	// apply query
+	res, err := stmt.ExecContext(ctx, q.Fields...)
+	if err != nil {
+		return 0,
+			object.StatusByCodeAndLog(constant.Code500,
+				err, "create: exec:")
 	}
 
 	// get id of new record
@@ -42,16 +48,32 @@ func (r *repo) Create(ctx context.Context, d dto.DTO) (int, object.Status) {
 			object.StatusByCodeAndLog(constant.Code500,
 				err, "create: last inserted id")
 	}
+	err = stmt.Close()
+	if err != nil {
+		return 0,
+			object.StatusByCodeAndLog(constant.Code500,
+				err, "create: close stmt")
+	}
 	return int(id), nil
 }
 
 func (r *repo) Delete(ctx context.Context, d dto.DTO) object.Status {
 	// prepare query for db
 	q := d.Delete().MakeQuery(r.schema)
-	_, err := r.db.ExecContext(ctx, q.Query, q.Fields...)
+	stmt, err := r.db.PrepareContext(ctx, q.Query)
+	if err != nil {
+		return object.StatusByCodeAndLog(constant.Code500,
+			err, "delete: stmt")
+	}
+	_, err = stmt.ExecContext(ctx, q.Fields...)
 	if err != nil {
 		return object.StatusByCodeAndLog(constant.Code500,
 			err, "delete")
+	}
+	err = stmt.Close()
+	if err != nil {
+		return object.StatusByCodeAndLog(constant.Code500,
+			err, "delete: close stmt")
 	}
 	return nil
 }

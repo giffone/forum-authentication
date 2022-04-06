@@ -2,8 +2,8 @@ package sqlitedb
 
 import (
 	"fmt"
-	"forum/internal/adapters/repository"
-	"forum/internal/constant"
+	"github.com/giffone/forum-authentication/internal/adapters/repository"
+	"github.com/giffone/forum-authentication/internal/constant"
 	"log"
 	"os"
 )

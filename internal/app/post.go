@@ -14,7 +14,7 @@ func (a *App) post(repo repository.Repo, srvCategory service.Category,
 }
 
 func (a *App) post2(srv service.Post, srvCategory service.Category,
-	srvComment service.Comment, apiRatio api.Ratio, ses api.Session) {
-	post2.NewHandler(srv, srvCategory, srvComment, apiRatio).Register(a.ctx, a.router, ses)
+	srvComment service.Comment, apiRatio api.Ratio, srvMid service.Middleware, apiMid api.Middleware) {
+	post2.NewHandler(srv, srvCategory, srvComment, srvMid, apiRatio).Register(a.ctx, a.router, apiMid)
 
 }

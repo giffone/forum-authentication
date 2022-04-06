@@ -12,33 +12,37 @@ import (
 )
 
 type sComment struct {
-	repo   repository.Repo
-	sPost  service.Post
-	sRatio service.Ratio
+	repo        repository.Repo
+	sPost       service.Post
+	sRatio      service.Ratio
+	sMiddleware service.Middleware
 }
 
-func NewService(repo repository.Repo, sPost service.Post, sRatio service.Ratio) service.Comment {
+func NewService(repo repository.Repo, sPost service.Post,
+	sRatio service.Ratio, sMiddleware service.Middleware) service.Comment {
 	return &sComment{
-		repo:   repo,
-		sPost:  sPost,
-		sRatio: sRatio,
+		repo:        repo,
+		sPost:       sPost,
+		sRatio:      sRatio,
+		sMiddleware: sMiddleware,
 	}
 }
 
 func (sc *sComment) Create(ctx context.Context, d *dto.Comment) (int, object.Status) {
 	ctx2, cancel := context.WithTimeout(ctx, constant.TimeLimitDB)
 	defer cancel()
-	// check post id before create comment
-	idPost, sts := sc.sPost.Check(ctx2, []string{d.Obj.Ck.PostString})
+
+	// check valid postID
+	postID := dto.NewCheckID(constant.KeyPost, []string{d.Obj.Ck.PostString})
+	ids, sts := sc.sMiddleware.Check(ctx, postID)
 	if sts != nil {
 		return 0, sts
 	}
-	// can not be len == 0 without sts-error, but...
-	if len(idPost) == 0 {
+	if ids != nil {
+		d.Obj.Ck.Post = ids[0]
+	} else {
 		return 0, object.StatusByCode(constant.Code400)
 	}
-	// post id from string to int
-	d.Obj.Ck.Post = idPost[0]
 	// create comment
 	id, sts := sc.repo.Create(ctx2, d)
 	if sts != nil {

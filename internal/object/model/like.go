@@ -6,17 +6,17 @@ import (
 	"time"
 )
 
-type Like struct {
+type Ratio struct {
 	PostOrComm int       // current post_id or comment_id
-	Like       int       // like_id or dislike_id
+	Ratio      int       // like_id or dislike_id
 	Body       string    // like or dislike (name)
 	Created    time.Time // created date
 	St         *object.Settings
 	Ck         *object.Cookie
 }
 
-func NewLike(st *object.Settings, ck *object.Cookie) *Like {
-	l := new(Like)
+func NewLike(st *object.Settings, ck *object.Cookie) *Ratio {
+	l := new(Ratio)
 	if st == nil {
 		l.St = &object.Settings{
 			Key: make(map[string][]interface{}),
@@ -32,7 +32,7 @@ func NewLike(st *object.Settings, ck *object.Cookie) *Like {
 	return l
 }
 
-func (l *Like) MakeKeys(key string, data ...interface{}) {
+func (l *Ratio) MakeKeys(key string, data ...interface{}) {
 	if key != "" {
 		l.St.Key[key] = data
 	} else {
@@ -40,7 +40,7 @@ func (l *Like) MakeKeys(key string, data ...interface{}) {
 	}
 }
 
-func (l *Like) Get() *object.QuerySettings {
+func (l *Ratio) Get() *object.QuerySettings {
 	qs := new(object.QuerySettings)
 	if value, ok := l.St.Key[constant.KeyPost]; ok {
 		qs.QueryName = constant.QueSelectLikeBy
@@ -107,7 +107,7 @@ func (l *Like) Get() *object.QuerySettings {
 	return qs
 }
 
-func (l *Like) New() []interface{} {
+func (l *Ratio) New() []interface{} {
 	if _, ok := l.St.Key[constant.KeyPostRated]; ok {
 		return []interface{}{
 			&l.Body,
@@ -119,7 +119,7 @@ func (l *Like) New() []interface{} {
 	}
 	return []interface{}{
 		&l.PostOrComm,
-		&l.Like,
+		&l.Ratio,
 		&l.Body,
 		&l.Created,
 	}

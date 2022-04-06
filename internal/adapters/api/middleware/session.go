@@ -8,41 +8,41 @@ import (
 	"github.com/giffone/forum-authentication/internal/object/dto"
 	"github.com/giffone/forum-authentication/internal/service"
 	uuid "github.com/nu7hatch/gouuid"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
 )
 
-type session struct {
-	service service.Session
+type middleware struct {
+	service service.Middleware
 }
 
-func NewSession(service service.Session) api.Session {
-	return &session{service: service}
+func NewMiddleware(service service.Middleware) api.Middleware {
+	return &middleware{service: service}
 }
 
-func (s *session) Apply(ctx context.Context, fn func(context.Context,
-	api.Session, http.ResponseWriter, *http.Request)) http.HandlerFunc {
+// Skip just
+func (mw *middleware) Skip(ctx context.Context, fn func(context.Context,
+	api.Middleware, http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fn(ctx, s, w, r)
+		fn(ctx, mw, w, r)
 	}
 }
 
-func (s *session) Create(ctx context.Context, w http.ResponseWriter, id int, method string) object.Status {
+func (mw *middleware) CreateSession(ctx context.Context, w http.ResponseWriter, id int, method string) object.Status {
 	ck := object.NewCookie().AddUser(id)
-	// generate session uuid
+	// generate middleware uuid
 	sID, err := uuid.NewV4()
 	if err != nil {
-		log.Printf("uuid generate: %v", err)
-		return object.StatusByCode(constant.Code500)
+		return object.StatusByCodeAndLog(constant.Code500,
+			err, "middleware create: generate uuid")
 	}
 	ck.SessionUUID = sID.String()
-	// create session in database
-	// if session exist, it will be deleted
+	// create middleware in database
+	// if middleware exist, it will be deleted
 	d := dto.NewSession(nil, nil, ck)
 	d.Add(time.Now().AddDate(0, 0, constant.SessionExpire))
-	_, sts := s.service.Create(ctx, d)
+	_, sts := mw.service.CreateSession(ctx, d)
 	if sts != nil {
 		return sts
 	}
@@ -55,35 +55,38 @@ func (s *session) Create(ctx context.Context, w http.ResponseWriter, id int, met
 	return nil
 }
 
-func (s *session) Check(ctx context.Context, fn func(context.Context, *object.Cookie,
+func (mw *middleware) CheckSession(ctx context.Context, fn func(context.Context, *object.Cookie,
 	object.Status, http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ck := object.NewCookie()
+		// get userID from cookie
 		sts := ck.CookieUserIDRead(r)
 		if sts != nil {
-			fn(ctx, object.NewCookie(), nil, w, r) // start with no session
+			fn(ctx, object.NewCookie(), nil, w, r) // start with no middleware
 			return
 		}
+		// get middleware uuid from cookie
 		sts = ck.CookieSessionRead(r)
 		if sts != nil {
-			fn(ctx, object.NewCookie(), nil, w, r) // start with no session
+			fn(ctx, object.NewCookie(), nil, w, r) // start with no middleware
 			return
 		}
-		// make new session DTO
+		// make new middleware DTO
 		d := dto.NewSession(nil, nil, ck)
 		d.Add(time.Now())
-		// get session from db
-		session, sts := s.service.Check(ctx, d)
+		// get middleware from db
+		session, sts := mw.service.CheckSession(ctx, d)
 		if sts != nil {
-			fn(ctx, object.NewCookie(), sts, w, r) // start with no session
+			fn(ctx, object.NewCookie(), sts, w, r) // start with no middleware
 			return
 		}
-		if sts == nil && session == nil { // if session did not match
+		// match middleware from db and cookie
+		if sts == nil && session == nil { // if middleware did not match
 			// delete from browser
 			sts = object.CookieSessionAndUserID(w,
 				[]string{"", ""}, "erase")
 			sts = object.StatusByText(constant.AccessDenied, "", nil)
-			fn(ctx, object.NewCookie(), sts, w, r) // start with no session
+			fn(ctx, object.NewCookie(), sts, w, r) // start with no middleware
 			return
 		}
 		ck.Session = true
@@ -91,7 +94,7 @@ func (s *session) Check(ctx context.Context, fn func(context.Context, *object.Co
 	}
 }
 
-func (s *session) End(w http.ResponseWriter) object.Status {
+func (mw *middleware) EndSession(w http.ResponseWriter) object.Status {
 	// create cookie
 	sts := object.CookieSessionAndUserID(w,
 		[]string{"", ""}, "erase")

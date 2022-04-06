@@ -21,13 +21,13 @@ func NewHandler(service service.User) api.Handler {
 	}
 }
 
-func (hu *hUser) Register(ctx context.Context, router *http.ServeMux, s api.Session) {
-	router.HandleFunc(constant.URLSignUp, s.Apply(ctx, hu.SignUp))
-	router.HandleFunc(constant.URLLogin, s.Apply(ctx, hu.Login))
-	router.HandleFunc(constant.URLLogout, s.Apply(ctx, hu.Logout))
+func (hu *hUser) Register(ctx context.Context, router *http.ServeMux, s api.Middleware) {
+	router.HandleFunc(constant.URLSignUp, s.Skip(ctx, hu.SignUp))
+	router.HandleFunc(constant.URLLogin, s.Skip(ctx, hu.Login))
+	router.HandleFunc(constant.URLLogout, s.Skip(ctx, hu.Logout))
 }
 
-func (hu *hUser) SignUp(ctx context.Context, ses api.Session,
+func (hu *hUser) SignUp(ctx context.Context, ses api.Middleware,
 	w http.ResponseWriter, r *http.Request) {
 	log.Println(r.Method, " ", r.URL.Path)
 	if r.Method != "POST" {
@@ -60,7 +60,7 @@ func (hu *hUser) SignUp(ctx context.Context, ses api.Session,
 	if m := r.PostFormValue("remember"); m == "on" {
 		method = "remember"
 	}
-	sts = ses.Create(ctx, w, id, method)
+	sts = ses.CreateSession(ctx, w, id, method)
 	if sts != nil {
 		api.Message(w, sts)
 		return
@@ -71,7 +71,7 @@ func (hu *hUser) SignUp(ctx context.Context, ses api.Session,
 	api.Message(w, sts)
 }
 
-func (hu *hUser) Login(ctx context.Context, ses api.Session,
+func (hu *hUser) Login(ctx context.Context, ses api.Middleware,
 	w http.ResponseWriter, r *http.Request) {
 	log.Println(r.Method, " ", r.URL.Path)
 	if r.Method == "GET" {
@@ -113,7 +113,7 @@ func (hu *hUser) Login(ctx context.Context, ses api.Session,
 	if m := r.PostFormValue("remember"); m == "on" {
 		method = "remember"
 	}
-	sts = ses.Create(ctx, w, id, method)
+	sts = ses.CreateSession(ctx, w, id, method)
 	if sts != nil {
 		api.Message(w, sts)
 		return
@@ -124,13 +124,13 @@ func (hu *hUser) Login(ctx context.Context, ses api.Session,
 	api.Message(w, sts)
 }
 
-func (hu *hUser) Logout(ctx context.Context, ses api.Session,
+func (hu *hUser) Logout(ctx context.Context, ses api.Middleware,
 	w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		api.Message(w, object.StatusByCode(constant.Code405))
 		return
 	}
-	sts := ses.End(w)
+	sts := ses.EndSession(w)
 	if sts != nil {
 		api.Message(w, sts)
 		return

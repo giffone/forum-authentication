@@ -17,24 +17,25 @@ type hPost struct {
 	service   service.Post
 	sCategory service.Category
 	sComment  service.Comment
-	ratio     api.Ratio
+	sRatio    service.Ratio
 }
 
 func NewHandler(service service.Post,
-	sCategory service.Category, sComment service.Comment, ratio api.Ratio) api.Handler {
+	sCategory service.Category, sComment service.Comment,
+	sRatio service.Ratio) api.Handler {
 	return &hPost{
 		service:   service,
 		sCategory: sCategory,
 		sComment:  sComment,
-		ratio:     ratio,
+		sRatio:    sRatio,
 	}
 }
 
-func (hp *hPost) Register(ctx context.Context, router *http.ServeMux, session api.Session) {
-	router.HandleFunc(constant.URLRead, session.Check(ctx, hp.Read))
-	router.HandleFunc(constant.URLPost, session.Check(ctx, hp.CreatePost))
-	router.HandleFunc(constant.URLComment, session.Check(ctx, hp.CreateComment))
-	router.HandleFunc(constant.URLReadRatio, session.Check(ctx, hp.CreateLike))
+func (hp *hPost) Register(ctx context.Context, router *http.ServeMux, middleware api.Middleware) {
+	router.HandleFunc(constant.URLRead, middleware.CheckSession(ctx, hp.Read))
+	router.HandleFunc(constant.URLPost, middleware.CheckSession(ctx, hp.CreatePost))
+	router.HandleFunc(constant.URLComment, middleware.CheckSession(ctx, hp.CreateComment))
+	router.HandleFunc(constant.URLReadRatio, middleware.CheckSession(ctx, hp.CreateRatio))
 }
 
 func (hp *hPost) Read(ctx context.Context, ck *object.Cookie, sts object.Status,
@@ -131,17 +132,6 @@ func (hp *hPost) CreateComment(ctx context.Context, ck *object.Cookie, sts objec
 		api.Message(w, comment.Obj.Sts)
 		return
 	}
-	// check postID valid
-	idPost, sts := hp.service.Check(ctx, []string{ck.PostString})
-	if sts != nil {
-		api.Message(w, sts)
-		return
-	}
-	if len(idPost) == 0 {
-		api.Message(w, object.StatusByCode(constant.Code400))
-		return
-	}
-	ck.Post = idPost[0]
 	// create comment in database
 	_, sts = hp.sComment.Create(ctx, comment)
 	if sts != nil {
@@ -152,7 +142,7 @@ func (hp *hPost) CreateComment(ctx context.Context, ck *object.Cookie, sts objec
 	hp.get(ctx, ck, w)
 }
 
-func (hp *hPost) CreateLike(ctx context.Context, ck *object.Cookie, sts object.Status,
+func (hp *hPost) CreateRatio(ctx context.Context, ck *object.Cookie, sts object.Status,
 	w http.ResponseWriter, r *http.Request) {
 	log.Println(r.Method, " ", r.URL.Path)
 	ctx, cancel := context.WithTimeout(ctx, constant.TimeLimit)
@@ -172,7 +162,19 @@ func (hp *hPost) CreateLike(ctx context.Context, ck *object.Cookie, sts object.S
 			"", nil))
 		return
 	}
-	hp.ratio.Rate(ctx, ck, r)
+	// create DTO with a new rate
+	ratio := dto.NewRatio(nil, nil, ck)
+	// add request data to DTO and check err
+	if !ratio.AddByGET(r) {
+		api.Message(w, ratio.Obj.Sts)
+		return
+	}
+	// create like
+	_, sts = hp.sRatio.Create(ctx, ratio)
+	if sts != nil {
+		api.Message(w, sts)
+		return
+	}
 	// get data from db, parse and execute response
 	hp.get(ctx, ck, w)
 }
@@ -189,7 +191,6 @@ func (hp *hPost) get(ctx context.Context, ck *object.Cookie, w http.ResponseWrit
 	// insert session
 	pe.Data["Session"] = ck.Session
 	// create new model posts
-	log.Printf("cookie is %v", ck)
 	p := model.NewPosts(nil, ck)
 	// make keys for sort posts
 	p.MakeKeys(constant.KeyPost)

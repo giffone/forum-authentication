@@ -3,8 +3,8 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"forum/internal/constant"
-	"forum/internal/object"
+	"github.com/giffone/forum-authentication/internal/constant"
+	"github.com/giffone/forum-authentication/internal/object"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"math/rand"

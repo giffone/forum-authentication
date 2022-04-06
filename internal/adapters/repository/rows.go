@@ -2,9 +2,9 @@ package repository
 
 import (
 	"database/sql"
-	"forum/internal/constant"
-	"forum/internal/object"
-	"forum/internal/object/model"
+	"github.com/giffone/forum-authentication/internal/constant"
+	"github.com/giffone/forum-authentication/internal/object"
+	"github.com/giffone/forum-authentication/internal/object/model"
 	"log"
 )
 

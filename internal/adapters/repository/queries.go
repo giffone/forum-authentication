@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"forum/internal/constant"
-	"forum/internal/object"
+	"github.com/giffone/forum-authentication/internal/constant"
+	"github.com/giffone/forum-authentication/internal/object"
 )
 
 func Query(ctx context.Context, db *sql.DB, query string, keys []interface{}) (*sql.Rows, object.Status) {

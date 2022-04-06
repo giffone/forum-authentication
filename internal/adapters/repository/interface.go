@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"forum/internal/object"
-	"forum/internal/object/dto"
-	"forum/internal/object/model"
+	"github.com/giffone/forum-authentication/internal/object"
+	"github.com/giffone/forum-authentication/internal/object/dto"
+	"github.com/giffone/forum-authentication/internal/object/model"
 )
 
 type New interface {

@@ -1,6 +1,6 @@
 package schema
 
-import "forum/internal/constant"
+import "github.com/giffone/forum-authentication/internal/constant"
 
 func Query() map[string]string {
 	return map[string]string{

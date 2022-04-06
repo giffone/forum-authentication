@@ -44,7 +44,7 @@ func (c *Cookie) CookieSessionRead(r *http.Request) Status {
 			err, "cookie: cookieSessionRead")
 	}
 	c.SessionUUID = ck.Value
-	log.Printf("object cookie: session-uuid is: %s", c.SessionUUID)
+	log.Printf("object cookie: middleware-uuid is: %s", c.SessionUUID)
 	return nil
 }
 
@@ -99,7 +99,8 @@ func cookieSet(w http.ResponseWriter, name []string, value []string, method stri
 	if lName != lValue {
 		e := fmt.Sprintf(" different length name(%d) and value(%d)\n", lName, lValue)
 		err := errors.New(e)
-		return StatusByCodeAndLog(constant.Code500, err, "create cookie:")
+		return StatusByCodeAndLog(constant.Code500,
+			err, "create cookie:")
 	}
 	for i := 0; i < len(name); i++ {
 		c := &http.Cookie{}

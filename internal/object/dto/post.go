@@ -59,8 +59,13 @@ func (p *Post) Valid() bool {
 func (p *Post) Create() *object.QuerySettings {
 	return &object.QuerySettings{
 		QueryName: constant.QueInsert4,
-		QueryFields: []interface{}{constant.TabPosts, constant.FieldUser,
-			constant.FieldTitle, constant.FieldBody, constant.FieldCreated},
+		QueryFields: []interface{}{
+			constant.TabPosts,
+			constant.FieldUser,
+			constant.FieldTitle,
+			constant.FieldBody,
+			constant.FieldCreated,
+		},
 		Fields: []interface{}{
 			p.Obj.Ck.User,
 			p.Title,

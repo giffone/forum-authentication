@@ -2,12 +2,13 @@ package app
 
 import (
 	"github.com/giffone/forum-authentication/internal/adapters/api"
-	"github.com/giffone/forum-authentication/internal/adapters/api/middleware"
+	middleware2 "github.com/giffone/forum-authentication/internal/adapters/api/middleware"
 	"github.com/giffone/forum-authentication/internal/adapters/repository"
-	"github.com/giffone/forum-authentication/internal/service/session"
+	"github.com/giffone/forum-authentication/internal/service"
+	"github.com/giffone/forum-authentication/internal/service/middleware"
 )
 
-func (a *App) session(repo repository.Repo) api.Session {
-	srv := session.NewService(repo)
-	return middleware.NewSession(srv)
+func (a *App) middlewareService(repo repository.Repo) (service.Middleware, api.Middleware) {
+	srv := middleware.NewService(repo)
+	return srv, middleware2.NewMiddleware(srv)
 }

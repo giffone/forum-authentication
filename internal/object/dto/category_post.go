@@ -6,9 +6,10 @@ import (
 )
 
 type CategoryPost struct {
-	Post     int // current new created
-	Category int // current id from slice
-	Slice    []string
+	Post     int      // current new created
+	Category int      // current id from slice
+	Slice    []string // from http response
+	ID       []int    // checked for valid from http response
 }
 
 func NewCategoryPost() *CategoryPost {

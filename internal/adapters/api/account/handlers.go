@@ -5,6 +5,7 @@ import (
 	"github.com/giffone/forum-authentication/internal/adapters/api"
 	"github.com/giffone/forum-authentication/internal/constant"
 	"github.com/giffone/forum-authentication/internal/object"
+	"github.com/giffone/forum-authentication/internal/object/dto"
 	"github.com/giffone/forum-authentication/internal/object/model"
 	"github.com/giffone/forum-authentication/internal/service"
 	"log"
@@ -15,22 +16,22 @@ type hAccount struct {
 	sPost     service.Post
 	sCategory service.Category
 	sComment  service.Comment
-	ratio     api.Ratio
+	sRatio    service.Ratio
 }
 
 func NewHandler(sPost service.Post, sCategory service.Category,
-	sComment service.Comment, ratio api.Ratio) api.Handler {
+	sComment service.Comment, sRatio service.Ratio) api.Handler {
 	return &hAccount{
 		sPost:     sPost,
 		sCategory: sCategory,
 		sComment:  sComment,
-		ratio:     ratio,
+		sRatio:    sRatio,
 	}
 }
 
-func (ha *hAccount) Register(ctx context.Context, router *http.ServeMux, session api.Session) {
-	router.HandleFunc(constant.URLAccount, session.Check(ctx, ha.ByUser))
-	router.HandleFunc(constant.URLAccountRatio, session.Check(ctx, ha.CreateLike))
+func (ha *hAccount) Register(ctx context.Context, router *http.ServeMux, session api.Middleware) {
+	router.HandleFunc(constant.URLAccount, session.CheckSession(ctx, ha.ByUser))
+	router.HandleFunc(constant.URLAccountRatio, session.CheckSession(ctx, ha.CreateLike))
 }
 
 func (ha *hAccount) ByUser(ctx context.Context, ck *object.Cookie, sts object.Status,
@@ -70,8 +71,19 @@ func (ha *hAccount) CreateLike(ctx context.Context, ck *object.Cookie, sts objec
 			"", nil))
 		return
 	}
+	// create DTO with a new rate
+	ratio := dto.NewRatio(nil, nil, ck)
+	// add request data to DTO and check err
+	if !ratio.AddByPOST(r) {
+		api.Message(w, ratio.Obj.Sts)
+		return
+	}
 	// make ratio
-	ha.ratio.Rate(ctx, ck, r)
+	_, sts = ha.sRatio.Create(ctx, ratio)
+	if sts != nil {
+		api.Message(w, sts)
+		return
+	}
 	redirect := r.PostFormValue(constant.KeyLink)
 	http.Redirect(w, r, constant.URLAccount+redirect, constant.Code302)
 	//ha.get(ctx, ck, w)

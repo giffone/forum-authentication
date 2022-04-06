@@ -19,7 +19,7 @@ type Buf struct {
 	Categories *Categories
 	Comment    *Comment
 	Comments   *Comments
-	Like       *Like
+	Like       *Ratio
 	LCount     *LCount
 	LikesCount *LikesCount
 	Post       *Post
@@ -27,6 +27,7 @@ type Buf struct {
 	Session    *Session
 	User       *User
 	Users      *Users
+	CheckID    *CheckID
 }
 
 type PostOrComment interface {

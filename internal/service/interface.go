@@ -11,7 +11,6 @@ type Post interface { // use cases
 	Create(ctx context.Context, dto *dto.Post) (int, object.Status)
 	Get(ctx context.Context, m model.Models) (interface{}, object.Status)
 	GetChan(ctx context.Context, m model.Models) (interface{}, object.Status)
-	Check(ctx context.Context, slice []string) ([]int, object.Status)
 }
 
 type User interface { // use cases
@@ -26,7 +25,6 @@ type Category interface { // use cases
 	GetList(ctx context.Context, m model.Models) (interface{}, object.Status)
 	GetFor(ctx context.Context, pc model.PostOrComment) object.Status
 	GetForChan(ctx context.Context, pc model.PostOrComment, channel chan object.Status)
-	Check(ctx context.Context, slice []string) ([]int, object.Status)
 }
 
 type Ratio interface { // use cases
@@ -35,12 +33,12 @@ type Ratio interface { // use cases
 	Liked(ctx context.Context, pc model.PostOrComment) object.Status
 	CountForChan(ctx context.Context, pc model.PostOrComment, channel chan object.Status)
 	LikedChan(ctx context.Context, pc model.PostOrComment, channel chan object.Status)
-	AddService(sPost Post, sComment Comment)
 }
 
-type Session interface { // use cases
-	Create(ctx context.Context, dto *dto.Session) (int, object.Status)
-	Check(ctx context.Context, dto *dto.Session) (interface{}, object.Status)
+type Middleware interface { // use cases
+	CreateSession(ctx context.Context, dto *dto.Session) (int, object.Status)
+	CheckSession(ctx context.Context, dto *dto.Session) (interface{}, object.Status)
+	Check(ctx context.Context, d *dto.CheckID) ([]int, object.Status)
 }
 
 type Comment interface {

@@ -25,10 +25,10 @@ func NewHandler(sPost service.Post, sCategory service.Category) api.Handler {
 	}
 }
 
-func (hh *hHome) Register(ctx context.Context, router *http.ServeMux, session api.Session) {
-	router.HandleFunc(constant.URLHome, session.Check(ctx, hh.Home))
+func (hh *hHome) Register(ctx context.Context, router *http.ServeMux, session api.Middleware) {
+	router.HandleFunc(constant.URLHome, session.CheckSession(ctx, hh.Home))
 	router.HandleFunc(constant.URLFavicon, hh.Favicon)
-	router.HandleFunc(constant.URLCategoryBy, session.Check(ctx, hh.ByCategory))
+	router.HandleFunc(constant.URLCategoryBy, session.CheckSession(ctx, hh.ByCategory))
 }
 
 func (hh *hHome) Home(ctx context.Context, ck *object.Cookie, sts object.Status,
@@ -95,7 +95,7 @@ func (hh *hHome) get(ctx context.Context, m model.Models, w http.ResponseWriter)
 		return
 	}
 	p := m.Return().Posts
-	// check session
+	// session
 	pe.Data["Session"] = p.Ck.Session
 	// get data
 	pe.Data["AllPost"] = p.St.AllPost

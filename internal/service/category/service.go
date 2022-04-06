@@ -8,7 +8,6 @@ import (
 	"github.com/giffone/forum-authentication/internal/object/dto"
 	"github.com/giffone/forum-authentication/internal/object/model"
 	"github.com/giffone/forum-authentication/internal/service"
-	"strconv"
 )
 
 type sCategory struct {
@@ -75,27 +74,4 @@ func (sc *sCategory) GetForChan(ctx context.Context, pc model.PostOrComment, cha
 		}
 	}
 	channel <- nil
-}
-
-func (sc *sCategory) Check(ctx context.Context, slice []string) ([]int, object.Status) {
-	var idCat []int
-	for i := 0; i < len(slice); i++ {
-		id, err := strconv.Atoi(slice[i])
-		if err != nil {
-			return nil, object.StatusByCodeAndLog(constant.Code500,
-				err, "check category: atoi")
-		}
-		categories := model.NewCategories(nil, nil)
-		categories.MakeKeys(constant.KeyID, id)
-
-		sts := sc.repo.GetList(ctx, categories)
-		if sts != nil {
-			return nil, sts
-		}
-		if len(categories.Slice) == 0 {
-			return nil, object.StatusByCode(constant.Code400)
-		}
-		idCat = append(idCat, id)
-	}
-	return idCat, nil
 }
