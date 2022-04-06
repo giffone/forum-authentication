@@ -5,19 +5,33 @@ import (
 )
 
 const (
-	URLHome         = "/"               // homepage
-	URLSignUp       = "/signup"         // for create user (in login page)
-	URLLogin        = "/login"          // for begin session
-	URLLogout       = "/logout"         // for end session
-	URLPost         = "/post"           // create post
-	URLRead         = "/read/"          // view one post
-	URLReadRatio    = "/read/ratio/"    // create like
-	URLCategory     = "/category"       // create category
-	URLCategoryBy   = "/category/"      // homepage sorted by categories
-	URLComment      = "/comment"        // create comment
-	URLAccount      = "/account/"       // administrator page
-	URLAccountRatio = "/account/ratio/" // administrator page
-	URLFavicon      = "/favicon.ico"    // add favicon site
+	URLHome            = "/"                      // homepage
+	URLSignUp          = "/signup"                // for create user (in login page)
+	URLLogin           = "/login"                 // for begin session
+	URLLoginGithub     = "/login/github"          // for begin session
+	URLLoginGithubCall = "/login/github/callback" // for begin session
+	URLLoginFacebook   = "/login/facebook"        // for begin session
+	URLLoginGoogle     = "/login/google"          // for begin session
+	URLLogout          = "/logout"                // for end session
+	URLPost            = "/post"                  // create post
+	URLRead            = "/read/"                 // view one post
+	URLReadRatio       = "/read/ratio/"           // create like
+	URLCategory        = "/category"              // create category
+	URLCategoryBy      = "/category/"             // homepage sorted by categories
+	URLComment         = "/comment"               // create comment
+	URLAccount         = "/account/"              // administrator page
+	URLAccountRatio    = "/account/ratio/"        // administrator page
+	URLFavicon         = "/favicon.ico"           // add favicon site
+
+	/*------------------------------------------------------*/
+
+	HomePage         = "http://localhost"
+	GithubAuthURL    = "https://github.com/login/oauth/authorize"
+	GithubTokenURL   = "https://github.com/login/oauth/access_token"
+	FacebookAuthURL  = "https://www.facebook.com/v3.2/dialog/oauth"
+	FacebookTokenURL = "https://graph.facebook.com/v3.2/oauth/access_token"
+	GoogleAuthURL    = "https://accounts.google.com/o/oauth2/auth"
+	GoogleTokenURL   = "https://oauth2.googleapis.com/token"
 
 	/*------------------------------------------------------*/
 
@@ -53,6 +67,7 @@ const (
 	Code200 = 200 // http.StatusOK (GET)
 	Code201 = 201 // http.StatusCreated (POST)
 	Code204 = 204 // http.StatusNoContent (PUT,PATCH,DELETE)
+	Code301 = 301 // http.StatusMovedPermanently
 	Code302 = 302 // http.StatusFound
 	Code400 = 400 // http.StatusBadRequest
 	Code401 = 401 // http.StatusUnauthorized
@@ -64,8 +79,8 @@ const (
 
 	/*------------------------------------------------------*/
 
-	StatusOK          = "Successfully: %s"
-	StatusCreated     = "Created: %s"
+	StatusOK          = "successfully: %s"
+	StatusCreated     = "created: %s"
 	AlreadyExist      = "can not create: %s already have"
 	InvalidCharacters = "invalid: the %s contains invalid characters"
 	TooShort          = "too short:  must be at least %s characters"
@@ -74,6 +89,7 @@ const (
 	InvalidEnter      = "invalid: the entered %s is incorrect, please use valid"
 	InternalError     = "internal error: \"%v\""
 	AccessDenied      = "access denied: you not authorized or session expired"
+	NotWorking        = "error: sorry, %s not working for now"
 
 	/*------------------------------------------------------*/
 

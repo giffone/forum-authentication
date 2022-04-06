@@ -3,6 +3,9 @@ package app
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"github.com/giffone/forum-authentication/internal/adapters/authentication"
+	"github.com/giffone/forum-authentication/internal/constant"
 	"net/http"
 )
 
@@ -22,8 +25,11 @@ func (a *App) Run(driver string) (*sql.DB, *http.ServeMux, string) {
 	repo := switcher(a.ctx, driver)
 	db, port, _ := repo.ExportSettings()
 
+	home := fmt.Sprintf("%s%s", constant.HomePage, port)
+	tokens := authentication.NewSocialToken(home)
+
 	srvMiddleware, apiMiddleware := a.middlewareService(repo)
-	a.user(repo, apiMiddleware)
+	a.user(repo, apiMiddleware, tokens)
 	srvCategory := a.category(repo)
 	srvRatio := a.ratio(repo, srvMiddleware)
 	srvComment := a.comment(repo, srvRatio, srvMiddleware)

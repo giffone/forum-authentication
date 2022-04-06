@@ -2,7 +2,10 @@ package user
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/giffone/forum-authentication/internal/adapters/api"
+	"github.com/giffone/forum-authentication/internal/adapters/authentication"
 	"github.com/giffone/forum-authentication/internal/constant"
 	"github.com/giffone/forum-authentication/internal/object"
 	"github.com/giffone/forum-authentication/internal/object/dto"
@@ -13,17 +16,20 @@ import (
 
 type hUser struct {
 	service service.User
+	auth    *authentication.Auth
 }
 
-func NewHandler(service service.User) api.Handler {
+func NewHandler(service service.User, auth *authentication.Auth) api.Handler {
 	return &hUser{
 		service: service,
+		auth:    auth,
 	}
 }
 
 func (hu *hUser) Register(ctx context.Context, router *http.ServeMux, s api.Middleware) {
 	router.HandleFunc(constant.URLSignUp, s.Skip(ctx, hu.SignUp))
 	router.HandleFunc(constant.URLLogin, s.Skip(ctx, hu.Login))
+	router.HandleFunc(constant.URLLoginGithub, hu.LoginGithub)
 	router.HandleFunc(constant.URLLogout, s.Skip(ctx, hu.Logout))
 }
 
@@ -80,6 +86,10 @@ func (hu *hUser) Login(ctx context.Context, ses api.Middleware,
 			api.Message(w, sts)
 			return
 		}
+		// link for refers login
+		pe.Data["Github"] = constant.URLLoginGithub
+		pe.Data["Facebook"] = constant.URLLoginFacebook
+		pe.Data["Google"] = constant.URLLoginGoogle
 		pe.Execute(w, constant.Code200)
 		return
 	}
@@ -122,6 +132,24 @@ func (hu *hUser) Login(ctx context.Context, ses api.Middleware,
 	sts = object.StatusByText(constant.StatusOK,
 		"you just logged in, to return on main page click button below", nil)
 	api.Message(w, sts)
+}
+
+func (hu *hUser) LoginGithub(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.Method, " ", r.URL.Path)
+	if r.Method != "GET" {
+		api.Message(w, object.StatusByCode(constant.Code405))
+		return
+	}
+	if hu.auth.Github.Empty {
+		api.Message(w, object.StatusByText(constant.NotWorking,
+			"github authentication", errors.New("github authentication settings is null")))
+		return
+	}
+	// Create the dynamic redirect URL for login
+	redirectURL := fmt.Sprintf("%s?client_id=%s&redirect_uri=%s%s",
+		hu.auth.Github.AuthURL, hu.auth.Github.ClientID, hu.auth.Home, constant.URLLoginGithubCall)
+
+	http.Redirect(w, r, redirectURL, constant.Code301)
 }
 
 func (hu *hUser) Logout(ctx context.Context, ses api.Middleware,

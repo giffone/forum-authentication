@@ -58,7 +58,7 @@ func (smw *sMiddleware) CheckID(ctx context.Context, d *dto.CheckID) ([]int, obj
 	for i := 0; i < len(d.ID); i++ {
 		id, err := strconv.Atoi(d.ID[i])
 		if err != nil {
-			return nil, object.StatusByCodeAndLog(constant.Code500,
+			return nil, object.StatusByCodeAndLog(constant.Code400,
 				err, "check id: atoi")
 		}
 		who := model.NewCheckID(nil, nil, nil)

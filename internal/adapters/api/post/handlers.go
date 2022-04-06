@@ -14,20 +14,22 @@ import (
 )
 
 type hPost struct {
-	service   service.Post
-	sCategory service.Category
-	sComment  service.Comment
-	sRatio    service.Ratio
+	service     service.Post
+	sCategory   service.Category
+	sComment    service.Comment
+	sRatio      service.Ratio
+	sMiddleware service.Middleware
 }
 
 func NewHandler(service service.Post,
 	sCategory service.Category, sComment service.Comment,
-	sRatio service.Ratio) api.Handler {
+	sRatio service.Ratio, sMiddleware service.Middleware) api.Handler {
 	return &hPost{
-		service:   service,
-		sCategory: sCategory,
-		sComment:  sComment,
-		sRatio:    sRatio,
+		service:     service,
+		sCategory:   sCategory,
+		sComment:    sComment,
+		sRatio:      sRatio,
+		sMiddleware: sMiddleware,
 	}
 }
 
@@ -50,17 +52,19 @@ func (hp *hPost) Read(ctx context.Context, ck *object.Cookie, sts object.Status,
 		api.Message(w, object.StatusByCode(constant.Code405))
 		return
 	}
-	u := r.URL.Query()
-	ck.PostString = u.Get("post")
-	// save id post in cookie
-	object.CookiePostID(w, ck.PostString)
-	idInt, err := strconv.Atoi(ck.PostString)
-	if err != nil {
-		api.Message(w, object.StatusByCodeAndLog(constant.Code400,
-			err, "read handler: postID: atoi"))
+	// git post id
+	ck.PostString = r.URL.Query().Get("post")
+	// check valid id for refer page
+	postID := dto.NewCheckID(constant.KeyPost, []string{ck.PostString})
+	ids, sts := hp.sMiddleware.CheckID(ctx, postID)
+	if sts != nil {
+		api.Message(w, sts)
 		return
 	}
-	ck.Post = idInt
+	// save id
+	ck.Post = ids[0]
+	// save id in cookie
+	object.CookiePostID(w, ck.PostString)
 	// get data from db, parse and execute response
 	hp.get(ctx, ck, w)
 }
@@ -175,6 +179,15 @@ func (hp *hPost) CreateRatio(ctx context.Context, ck *object.Cookie, sts object.
 		api.Message(w, sts)
 		return
 	}
+	// check valid id for refer page
+	postID := dto.NewCheckID(constant.KeyPost, []string{ck.PostString})
+	ids, sts := hp.sMiddleware.CheckID(ctx, postID)
+	if sts != nil {
+		api.Message(w, sts)
+		return
+	}
+	// save id
+	ck.Post = ids[0]
 	// get data from db, parse and execute response
 	hp.get(ctx, ck, w)
 }

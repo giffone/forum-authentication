@@ -55,7 +55,7 @@ func NewParseExecute(define string) *ParseExecute {
 		return &ParseExecute{
 			PathTmpl:   []string{constant.PathLoginObj},
 			DefineTmpl: define,
-			Data:       nil,
+			Data:       make(map[string]interface{}),
 		}
 	case "message":
 		return &ParseExecute{
