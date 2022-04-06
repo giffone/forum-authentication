@@ -14,16 +14,12 @@ import (
 )
 
 type sMiddleware struct {
-	repo      repository.Repo
-	sPost     service.Post
-	sCategory service.Category
+	repo repository.Repo
 }
 
-func NewService(repo repository.Repo, sPost service.Post, sCategory service.Category) service.Middleware {
+func NewService(repo repository.Repo) service.Middleware {
 	return &sMiddleware{
-		repo:      repo,
-		sPost:     sPost,
-		sCategory: sCategory,
+		repo: repo,
 	}
 }
 
@@ -57,7 +53,7 @@ func (smw *sMiddleware) CheckSession(ctx context.Context, d *dto.Session) (inter
 	return session, sts
 }
 
-func (smw *sMiddleware) Check(ctx context.Context, d *dto.CheckID) ([]int, object.Status) {
+func (smw *sMiddleware) CheckID(ctx context.Context, d *dto.CheckID) ([]int, object.Status) {
 	var ids []int
 	for i := 0; i < len(d.ID); i++ {
 		id, err := strconv.Atoi(d.ID[i])

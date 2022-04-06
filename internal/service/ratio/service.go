@@ -195,7 +195,7 @@ func (sr *sRatio) LikedChan(ctx context.Context, pc model.PostOrComment, channel
 
 func (sr *sRatio) checkID(ctx context.Context, postOrComm string, slice []string) (int, object.Status) {
 	id := dto.NewCheckID(postOrComm, slice)
-	ids, sts := sr.sMiddleware.Check(ctx, id)
+	ids, sts := sr.sMiddleware.CheckID(ctx, id)
 	if sts != nil {
 		return 0, sts
 	}

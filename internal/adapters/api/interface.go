@@ -19,7 +19,3 @@ type Middleware interface { // middleware for handlers
 		*http.Request)) http.HandlerFunc
 	EndSession(w http.ResponseWriter) object.Status
 }
-
-type Ratio interface {
-	Rate(ctx context.Context, ck *object.Cookie, r *http.Request) object.Status
-}

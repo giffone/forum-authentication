@@ -6,7 +6,7 @@ import (
 	"github.com/giffone/forum-authentication/internal/service/comment"
 )
 
-func (a *App) comment(repo repository.Repo, srvPost service.Post, srvRatio service.Ratio) service.Comment {
-	srv := comment.NewService(repo, srvPost, srvRatio)
+func (a *App) comment(repo repository.Repo, srvRatio service.Ratio, sMid service.Middleware) service.Comment {
+	srv := comment.NewService(repo, srvRatio, sMid)
 	return srv
 }

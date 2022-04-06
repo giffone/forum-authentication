@@ -8,13 +8,9 @@ import (
 	"github.com/giffone/forum-authentication/internal/service/post"
 )
 
-func (a *App) post(repo repository.Repo, srvCategory service.Category,
-	srvRatio service.Ratio) service.Post {
-	return post.NewService(repo, srvRatio, srvCategory)
-}
-
-func (a *App) post2(srv service.Post, srvCategory service.Category,
-	srvComment service.Comment, apiRatio api.Ratio, srvMid service.Middleware, apiMid api.Middleware) {
-	post2.NewHandler(srv, srvCategory, srvComment, srvMid, apiRatio).Register(a.ctx, a.router, apiMid)
-
+func (a *App) post(repo repository.Repo, srvCategory service.Category, srvComment service.Comment,
+	srvRatio service.Ratio, sMid service.Middleware, apiMid api.Middleware) service.Post {
+	srv := post.NewService(repo, srvCategory, srvRatio, sMid)
+	post2.NewHandler(srv, srvCategory, srvComment, srvRatio).Register(a.ctx, a.router, apiMid)
+	return srv
 }

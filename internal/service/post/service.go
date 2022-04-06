@@ -13,13 +13,13 @@ import (
 
 type sPost struct {
 	repo        repository.Repo
-	sLike       service.Ratio
 	sCategory   service.Category
+	sLike       service.Ratio
 	sMiddleware service.Middleware
 }
 
-func NewService(repo repository.Repo, sLike service.Ratio,
-	sCategory service.Category, sMiddleware service.Middleware) service.Post {
+func NewService(repo repository.Repo, sCategory service.Category,
+	sLike service.Ratio, sMiddleware service.Middleware) service.Post {
 	return &sPost{
 		repo:        repo,
 		sLike:       sLike,
@@ -35,7 +35,7 @@ func (sp *sPost) Create(ctx context.Context, d *dto.Post) (int, object.Status) {
 	// check valid categories
 	if len(d.Categories.Slice) > 0 {
 		categories := dto.NewCheckID(constant.KeyCategory, d.Categories.Slice)
-		ids, sts := sp.sMiddleware.Check(ctx, categories)
+		ids, sts := sp.sMiddleware.CheckID(ctx, categories)
 		if sts != nil {
 			return 0, sts
 		}

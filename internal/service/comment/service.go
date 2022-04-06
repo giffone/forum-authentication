@@ -8,21 +8,18 @@ import (
 	"github.com/giffone/forum-authentication/internal/object/dto"
 	"github.com/giffone/forum-authentication/internal/object/model"
 	"github.com/giffone/forum-authentication/internal/service"
-	"strconv"
 )
 
 type sComment struct {
 	repo        repository.Repo
-	sPost       service.Post
 	sRatio      service.Ratio
 	sMiddleware service.Middleware
 }
 
-func NewService(repo repository.Repo, sPost service.Post,
-	sRatio service.Ratio, sMiddleware service.Middleware) service.Comment {
+func NewService(repo repository.Repo, sRatio service.Ratio,
+	sMiddleware service.Middleware) service.Comment {
 	return &sComment{
 		repo:        repo,
-		sPost:       sPost,
 		sRatio:      sRatio,
 		sMiddleware: sMiddleware,
 	}
@@ -34,7 +31,7 @@ func (sc *sComment) Create(ctx context.Context, d *dto.Comment) (int, object.Sta
 
 	// check valid postID
 	postID := dto.NewCheckID(constant.KeyPost, []string{d.Obj.Ck.PostString})
-	ids, sts := sc.sMiddleware.Check(ctx, postID)
+	ids, sts := sc.sMiddleware.CheckID(ctx, postID)
 	if sts != nil {
 		return 0, sts
 	}
@@ -161,27 +158,4 @@ func (sc *sComment) referChan(ctx context.Context, c *model.Comments, channel ch
 		c.Slice[i].Title = p
 	}
 	channel <- nil
-}
-
-func (sc *sComment) Check(ctx context.Context, slice []string) ([]int, object.Status) {
-	var idComm []int
-	for i := 0; i < len(slice); i++ {
-		id, err := strconv.Atoi(slice[i])
-		if err != nil {
-			return nil, object.StatusByCodeAndLog(constant.Code500,
-				err, "check comment: atoi")
-		}
-		comments := model.NewComments(nil, nil)
-		comments.MakeKeys(constant.KeyID, id)
-
-		sts := sc.repo.GetList(ctx, comments)
-		if sts != nil {
-			return nil, sts
-		}
-		if len(comments.Slice) == 0 {
-			return nil, object.StatusByCode(constant.Code400)
-		}
-		idComm = append(idComm, id)
-	}
-	return idComm, nil
 }
