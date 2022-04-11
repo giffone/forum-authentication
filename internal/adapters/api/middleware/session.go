@@ -85,7 +85,7 @@ func (mw *middleware) CheckSession(ctx context.Context, fn func(context.Context,
 			// delete from browser
 			sts = object.CookieSessionAndUserID(w,
 				[]string{"", ""}, "erase")
-			sts = object.StatusByText(constant.AccessDenied, "", nil)
+			sts = object.StatusByText(nil, constant.AccessDenied)
 			fn(ctx, object.NewCookie(), sts, w, r) // start with no middleware
 			return
 		}

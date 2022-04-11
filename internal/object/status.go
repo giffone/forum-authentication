@@ -37,8 +37,8 @@ func (s *Statuses) StatusByCode(code int) *Statuses {
 	return s
 }
 
-func (s *Statuses) StatusByText(text, args string, err error) {
-	sts := statusByText(text, args, err)
+func (s *Statuses) StatusByText(err error, text string, args ...any) {
+	sts := statusByText(err, text, args)
 	s.StatusBody = sts.StatusBody
 	s.StatusCode = sts.StatusCode
 }
@@ -58,26 +58,27 @@ func StatusByCode(code int) *Statuses {
 	}
 }
 
-func StatusByText(text, args string, err error) *Statuses {
-	return statusByText(text, args, err)
+func StatusByText(err error, text string, args ...any) *Statuses {
+	return statusByText(err, text, args)
 }
 
-func statusByText(text, args string, err error) *Statuses {
-	e := new(Statuses)
+func statusByText(err error, text string, args []any) *Statuses {
+	sts := new(Statuses)
 	if err != nil {
-		log.Printf("err by text: %s\n", err.Error())
+		e := err.Error()
+		log.Printf("status by text: err: %s\n", e)
 	}
-	if args == "" {
-		e.StatusBody = text
+	if len(args) == 0 {
+		sts.StatusBody = text
 	} else {
-		e.StatusBody = fmt.Sprintf(text, args)
+		sts.StatusBody = fmt.Sprintf(text, args...)
 	}
 	if text == constant.StatusOK {
-		e.StatusCode = constant.Code200
+		sts.StatusCode = constant.Code200
 	} else if text == constant.StatusCreated {
-		e.StatusCode = constant.Code201
+		sts.StatusCode = constant.Code201
 	} else {
-		e.StatusCode = constant.Code403
+		sts.StatusCode = constant.Code403
 	}
-	return e
+	return sts
 }

@@ -55,14 +55,14 @@ func (hp *hPost) Read(ctx context.Context, ck *object.Cookie, sts object.Status,
 	// git post id
 	ck.PostString = r.URL.Query().Get("post")
 	// check valid id for refer page
-	postID := dto.NewCheckID(constant.KeyPost, []string{ck.PostString})
-	ids, sts := hp.sMiddleware.CheckID(ctx, postID)
+	post := dto.NewCheckIDAtoi(constant.KeyPost, ck.PostString)
+	idWho, sts := hp.sMiddleware.GetID(ctx, post)
 	if sts != nil {
 		api.Message(w, sts)
 		return
 	}
 	// save id
-	ck.Post = ids[0]
+	ck.Post = idWho
 	// save id in cookie
 	object.CookiePostID(w, ck.PostString)
 	// get data from db, parse and execute response
@@ -85,8 +85,7 @@ func (hp *hPost) CreatePost(ctx context.Context, ck *object.Cookie, sts object.S
 	}
 	// need session always to continue
 	if !ck.Session {
-		api.Message(w, object.StatusByText(constant.AccessDenied,
-			"", nil))
+		api.Message(w, object.StatusByText(nil, constant.AccessDenied))
 		return
 	}
 	// create DTO with a new post
@@ -125,8 +124,7 @@ func (hp *hPost) CreateComment(ctx context.Context, ck *object.Cookie, sts objec
 	}
 	// need session always to continue
 	if !ck.Session {
-		api.Message(w, object.StatusByText(constant.AccessDenied,
-			"", nil))
+		api.Message(w, object.StatusByText(nil, constant.AccessDenied))
 		return
 	}
 	// create DTO with a new comment
@@ -162,8 +160,7 @@ func (hp *hPost) CreateRatio(ctx context.Context, ck *object.Cookie, sts object.
 	}
 	// need session always to continue
 	if !ck.Session {
-		api.Message(w, object.StatusByText(constant.AccessDenied,
-			"", nil))
+		api.Message(w, object.StatusByText(nil, constant.AccessDenied))
 		return
 	}
 	// create DTO with a new rate
@@ -180,14 +177,14 @@ func (hp *hPost) CreateRatio(ctx context.Context, ck *object.Cookie, sts object.
 		return
 	}
 	// check valid id for refer page
-	postID := dto.NewCheckID(constant.KeyPost, []string{ck.PostString})
-	ids, sts := hp.sMiddleware.CheckID(ctx, postID)
+	postID := dto.NewCheckIDAtoi(constant.KeyPost, ck.PostString)
+	idWho, sts := hp.sMiddleware.GetID(ctx, postID)
 	if sts != nil {
 		api.Message(w, sts)
 		return
 	}
 	// save id
-	ck.Post = ids[0]
+	ck.Post = idWho
 	// get data from db, parse and execute response
 	hp.get(ctx, ck, w)
 }

@@ -42,7 +42,7 @@ func (p *Post) Valid() bool {
 	// delete space for check an any symbol
 	body := strings.TrimSpace(p.Body)
 	if body == "" {
-		p.Obj.Sts.StatusByText(constant.TooShort, "one", nil)
+		p.Obj.Sts.StatusByText(nil, constant.TooShort, "post", "one")
 		return false
 	}
 	body = strings.TrimSpace(p.Title)

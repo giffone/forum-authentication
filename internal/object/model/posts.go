@@ -113,10 +113,10 @@ func (p *Posts) NewList() []interface{} {
 			&post.Title,
 			&post.Body,
 			&post.User,
-			&post.Login,
+			&post.Name,
 			&post.Created,
 			&comment.ID,
-			&comment.Login,
+			&comment.Name,
 			&comment.Body,
 			&comment.Created,
 		}
@@ -126,7 +126,7 @@ func (p *Posts) NewList() []interface{} {
 			&post.Title,
 			&post.Body,
 			&post.User,
-			&post.Login,
+			&post.Name,
 			&post.Created,
 			&post.Liked,
 		}
@@ -140,7 +140,7 @@ func (p *Posts) NewList() []interface{} {
 		&post.Title,
 		&post.Body,
 		&post.User,
-		&post.Login,
+		&post.Name,
 		&post.Created,
 	}
 }

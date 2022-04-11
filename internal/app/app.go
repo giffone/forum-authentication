@@ -29,7 +29,8 @@ func (a *App) Run(driver string) (*sql.DB, *http.ServeMux, string) {
 	tokens := authentication.NewSocialToken(home)
 
 	srvMiddleware, apiMiddleware := a.middlewareService(repo)
-	a.user(repo, apiMiddleware, tokens)
+	srvUser := a.user(repo, apiMiddleware, tokens)
+	a.authentication(tokens, srvUser, srvMiddleware, apiMiddleware)
 	srvCategory := a.category(repo)
 	srvRatio := a.ratio(repo, srvMiddleware)
 	srvComment := a.comment(repo, srvRatio, srvMiddleware)

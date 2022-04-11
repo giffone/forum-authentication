@@ -40,8 +40,8 @@ func (c *Comment) Valid() bool {
 	// delete space for check an any symbol
 	body := strings.TrimSpace(c.Body)
 	if body == "" {
-		c.Obj.Sts.StatusByText(constant.TooShort,
-			"one", nil)
+		c.Obj.Sts.StatusByText(nil, constant.TooShort,
+			"comment", "one")
 		return false
 	}
 	return true

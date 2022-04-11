@@ -30,16 +30,12 @@ func (sc *sComment) Create(ctx context.Context, d *dto.Comment) (int, object.Sta
 	defer cancel()
 
 	// check valid postID
-	postID := dto.NewCheckID(constant.KeyPost, []string{d.Obj.Ck.PostString})
-	ids, sts := sc.sMiddleware.CheckID(ctx, postID)
+	postID := dto.NewCheckIDAtoi(constant.KeyPost, d.Obj.Ck.PostString)
+	idWho, sts := sc.sMiddleware.GetID(ctx, postID)
 	if sts != nil {
 		return 0, sts
 	}
-	if ids != nil {
-		d.Obj.Ck.Post = ids[0]
-	} else {
-		return 0, object.StatusByCode(constant.Code400)
-	}
+	d.Obj.Ck.Post = idWho
 	// create comment
 	id, sts := sc.repo.Create(ctx2, d)
 	if sts != nil {

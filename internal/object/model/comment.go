@@ -9,7 +9,7 @@ type Comment struct {
 	Title   *Post // refer to post
 	Body    string
 	User    int
-	Login   string
+	Name    string
 	Created time.Time
 	Likes   interface{}
 	Liked   interface{}

@@ -67,8 +67,7 @@ func (ha *hAccount) CreateLike(ctx context.Context, ck *object.Cookie, sts objec
 	}
 	// need session always to continue
 	if !ck.Session {
-		api.Message(w, object.StatusByText(constant.AccessDenied,
-			"", nil))
+		api.Message(w, object.StatusByText(nil, constant.AccessDenied))
 		return
 	}
 	// create DTO with a new rate

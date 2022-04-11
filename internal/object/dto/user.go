@@ -1,6 +1,8 @@
 package dto
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/giffone/forum-authentication/internal/constant"
 	"github.com/giffone/forum-authentication/internal/object"
 	"github.com/giffone/forum-authentication/pkg/password"
@@ -12,10 +14,12 @@ import (
 )
 
 type User struct {
-	Login      string
+	Id         any    `json:"id"` // (not exported) only for authentication from social network
+	Login      string `json:"login"`
+	Name       string `json:"name"`
 	Password   string
 	RePassword string
-	Email      string
+	Email      string `json:"email"`
 	ReEmail    string
 	Created    time.Time
 	Obj        object.Obj
@@ -29,6 +33,10 @@ func NewUser(st *object.Settings, sts *object.Statuses) *User {
 
 func (u *User) Add(r *http.Request) {
 	u.Login = strings.ToLower(r.PostFormValue("login"))
+	u.Name = strings.ToLower(r.PostFormValue("name"))
+	if u.Name == "" {
+		u.Name = u.Login
+	}
 	u.Password = r.PostFormValue("password")
 	u.RePassword = r.PostFormValue("re-password")
 	u.Email = strings.ToLower(r.PostFormValue("email"))
@@ -39,6 +47,30 @@ func (u *User) Add(r *http.Request) {
 	}
 }
 
+func (u *User) AddJSON(data []byte) error {
+	err := json.Unmarshal(data, u)
+	if err != nil {
+		return err
+	}
+	if u.Login == "" {
+		if u.Email != "" {
+			u.Login = u.Email
+		} else {
+			u.Login = fmt.Sprintf("login_%s", u.Id)
+		}
+	}
+	if u.Name == "" {
+		u.Name = u.Login
+	}
+	if u.Email == "" {
+		u.Email = u.Login
+	}
+	u.ReEmail = u.Email
+	u.Password = password.Generate()
+	u.RePassword = u.Password
+	return nil
+}
+
 func (u *User) ValidLogin() bool {
 	if u.Obj.Sts.StatusBody != "" {
 		return false
@@ -46,13 +78,13 @@ func (u *User) ValidLogin() bool {
 	validChar := regexp.MustCompile(`\w`)
 
 	if len(u.Login) < constant.LoginMinLength {
-		u.Obj.Sts.StatusByText(constant.TooShort,
-			"three", nil)
+		u.Obj.Sts.StatusByText(nil, constant.TooShort,
+			"login", "three")
 		return false
 	}
 	if ok := validChar.MatchString(u.Login); !ok {
-		u.Obj.Sts.StatusByText(constant.InvalidCharacters,
-			"login", nil)
+		u.Obj.Sts.StatusByText(nil, constant.InvalidCharacters,
+			"login")
 		return false
 	}
 	return true
@@ -65,23 +97,22 @@ func (u *User) ValidPassword() bool {
 	validChar := regexp.MustCompile(`\w`)
 
 	if u.Password != u.RePassword {
-		u.Obj.Sts.StatusByText(constant.NotMatch,
-			"password", nil)
+		u.Obj.Sts.StatusByText(nil, constant.NotMatch,
+			"password")
 		return false
 	}
 	if len(u.Password) < constant.PasswordMinLength {
-		u.Obj.Sts.StatusByText(constant.TooShort,
-			"six", nil)
+		u.Obj.Sts.StatusByText(nil, constant.TooShort,
+			"password", "six")
 		return false
 	}
 	if ok := validChar.MatchString(u.Password); !ok {
-		u.Obj.Sts.StatusByText(constant.InvalidCharacters,
-			"password", nil)
+		u.Obj.Sts.StatusByText(nil, constant.InvalidCharacters,
+			"password")
 		return false
 	}
-	if err := password.ValidPassword(u.Password); err != nil {
-		u.Obj.Sts.StatusByText(err.Error(),
-			"", err)
+	if err := password.Valid(u.Password); err != nil {
+		u.Obj.Sts.StatusByText(err, err.Error())
 		return false
 	}
 	return true
@@ -106,14 +137,14 @@ func (u *User) ValidEmail() bool {
 		return false
 	}
 	if u.Email != u.ReEmail {
-		u.Obj.Sts.StatusByText(constant.NotMatch,
-			"email", nil)
+		u.Obj.Sts.StatusByText(nil, constant.NotMatch,
+			"email")
 		return false
 	}
 	validEmail := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 	if ok := validEmail.MatchString(u.Email); !ok {
-		u.Obj.Sts.StatusByText(constant.InvalidEnter,
-			"email", nil)
+		u.Obj.Sts.StatusByText(nil, constant.InvalidEnter,
+			"email")
 		return false
 	}
 	//_, err := mail.ParseAddress(u.Email)
@@ -135,16 +166,18 @@ func (u *User) MakeKeys(key string, data ...interface{}) {
 
 func (u *User) Create() *object.QuerySettings {
 	return &object.QuerySettings{
-		QueryName: constant.QueInsert4,
+		QueryName: constant.QueInsert5,
 		QueryFields: []interface{}{
 			constant.TabUsers,
 			constant.FieldLogin,
+			constant.FieldName,
 			constant.FieldPassword,
 			constant.FieldEmail,
 			constant.FieldCreated,
 		},
 		Fields: []interface{}{
 			u.Login,
+			u.Name,
 			u.Password,
 			u.Email,
 			time.Now(),

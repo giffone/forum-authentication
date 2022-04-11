@@ -31,14 +31,14 @@ func (r *repo) Create(ctx context.Context, d dto.DTO) (int, object.Status) {
 	if err != nil {
 		return 0,
 			object.StatusByCodeAndLog(constant.Code500,
-				err, "create: stmt:")
+				err, "create: stmt")
 	}
 	// apply query
 	res, err := stmt.ExecContext(ctx, q.Fields...)
 	if err != nil {
 		return 0,
 			object.StatusByCodeAndLog(constant.Code500,
-				err, "create: exec:")
+				err, "create: exec")
 	}
 
 	// get id of new record

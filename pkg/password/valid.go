@@ -5,7 +5,7 @@ import (
 	"unicode"
 )
 
-func ValidPassword(s string) error {
+func Valid(s string) error {
 next:
 	for name, classes := range map[string][]*unicode.RangeTable{
 		"upper case": {unicode.Upper, unicode.Title},

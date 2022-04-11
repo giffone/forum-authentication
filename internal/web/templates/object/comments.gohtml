@@ -3,7 +3,7 @@
         {{range .}}
             {{if ne .ID 0}}
                 <div class="title">
-                    <div><b>{{.Login}}</b>{{.Created | dateForum | printf " on %s" }}</div>
+                    <div><b>{{.Name}}</b>{{.Created | dateForum | printf " on %s" }}</div>
                 </div>
                 <div class="comment-text">{{.Body}}</div>
                 {{template "ratio" .}}
@@ -21,7 +21,7 @@
                     {{template "one_post_title" .Title}}
                 </div>
                 <div class="title">
-                    <div><b>{{.Login}}</b>{{.Created | dateForum | printf " on %s" }}</div>
+                    <div><b>{{.Name}}</b>{{.Created | dateForum | printf " on %s" }}</div>
                 </div>
                 <div class="comment-text">{{.Body}}</div>
                 {{template "ratio" .}}

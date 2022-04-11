@@ -16,7 +16,6 @@ type Post interface { // use cases
 type User interface { // use cases
 	Create(ctx context.Context, dto *dto.User) (int, object.Status)
 	CheckLoginPassword(ctx context.Context, dto *dto.User) (int, object.Status)
-	//Check(ctx context.Context, slice []string) ([]int, object.Status)
 }
 
 type Category interface { // use cases
@@ -38,7 +37,7 @@ type Ratio interface { // use cases
 type Middleware interface { // use cases
 	CreateSession(ctx context.Context, dto *dto.Session) (int, object.Status)
 	CheckSession(ctx context.Context, dto *dto.Session) (interface{}, object.Status)
-	CheckID(ctx context.Context, d *dto.CheckID) ([]int, object.Status)
+	GetID(ctx context.Context, d *dto.CheckID) (int, object.Status)
 }
 
 type Comment interface {

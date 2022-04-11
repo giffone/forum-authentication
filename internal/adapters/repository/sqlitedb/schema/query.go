@@ -25,6 +25,7 @@ func Query() map[string]string {
 		constant.TabUsers: `CREATE TABLE IF NOT EXISTS %s (
 		"id"		INTEGER NOT NULL,
 		"login"		TEXT NOT NULL UNIQUE,
+		"name"		TEXT NOT NULL,
 		"password"	TEXT NOT NULL,
 		"email"		TEXT NOT NULL UNIQUE,
 		"root"		INTEGER NOT NULL DEFAULT 0,
@@ -95,33 +96,38 @@ func Query() map[string]string {
 		"uuid"		TEXT NOT NULL UNIQUE,
 		"expire"	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);`,
 
+		constant.TabTokens: `CREATE TABLE IF NOT EXISTS %s (
+		"id"		TEXT NOT NULL,
+		"token"		TEXT NOT NULL UNIQUE,
+		"expire"	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);`,
+
 		constant.QueSelect: `SELECT id
 		FROM		%s
 		WHERE		%s.%s = ?;`,
 
-		constant.QueSelectPosts: `SELECT posts.id, posts.title, posts.body, posts.user, src_users.login, posts.created
+		constant.QueSelectPosts: `SELECT posts.id, posts.title, posts.body, posts.user, src_users.name, posts.created
 		FROM		posts
 		LEFT JOIN	src_users ON posts.user = src_users.id
 		ORDER BY	posts.id DESC;`,
 
-		constant.QueSelectUsers: `SELECT src_users.id, src_users.login, src_users.password, src_users.email, src_users.root, src_users.created
+		constant.QueSelectUsers: `SELECT src_users.id, src_users.login, src_users.name, src_users.password, src_users.email, src_users.root, src_users.created
 		FROM	src_users;`,
 
 		constant.QueSelectCategories: `SELECT src_categories.id, src_categories.body
 		FROM		src_categories
 		ORDER BY	src_categories.id ASC;`,
 
-		constant.QueSelectUserBy: `SELECT src_users.id, src_users.login, src_users.password, src_users.email, src_users.root, src_users.created
+		constant.QueSelectUserBy: `SELECT src_users.id, src_users.login, src_users.name, src_users.password, src_users.email, src_users.root, src_users.created
 		FROM	src_users
 		WHERE	src_users.%s = ?;`,
 
-		constant.QueSelectPostsBy: `SELECT posts.id, posts.title, posts.body, posts.user, src_users.login, posts.created
+		constant.QueSelectPostsBy: `SELECT posts.id, posts.title, posts.body, posts.user, src_users.name, posts.created
 		FROM		posts
 		LEFT JOIN	src_users ON src_users.id = posts.user
 		WHERE		%s.%s = ?
 		ORDER BY	posts.id DESC;`,
 
-		constant.QueSelectCommentsBy: `SELECT comments.id, src_users.login, comments.body, comments.created, comments.post
+		constant.QueSelectCommentsBy: `SELECT comments.id, src_users.name, comments.body, comments.created, comments.post
 		FROM		comments
 		LEFT JOIN	src_users ON comments.user = src_users.id
 		WHERE		%s.%s = ?
@@ -144,7 +150,7 @@ func Query() map[string]string {
 		WHERE		%s.%s = ?
 		AND %s.%s = ?;`,
 
-		constant.QueSelectPostsRatedBy: `SELECT posts.id, posts.title, posts.body, posts.user, src_users.login, posts.created, src_likes.body
+		constant.QueSelectPostsRatedBy: `SELECT posts.id, posts.title, posts.body, posts.user, src_users.name, posts.created, src_likes.body
 		FROM		posts
 		LEFT JOIN	src_users ON src_users.id = posts.user
 		INNER JOIN	posts_likes ON posts_likes.post = posts.id
@@ -152,7 +158,7 @@ func Query() map[string]string {
 		WHERE		%s.%s = ?
 		ORDER BY	posts.id DESC;`,
 
-		constant.QueSelectCommentsRatedBy: `SELECT comments.id, src_users.login, comments.body, comments.created, comments.post, src_likes.body
+		constant.QueSelectCommentsRatedBy: `SELECT comments.id, src_users.name, comments.body, comments.created, comments.post, src_likes.body
 		FROM		comments
 		LEFT JOIN	src_users ON src_users.id = comments.user
 		INNER JOIN	comments_likes ON comments_likes.comment = comments.id
@@ -160,7 +166,7 @@ func Query() map[string]string {
 		WHERE		%s.%s = ?
 		ORDER BY	comments.id DESC`,
 
-		constant.QueSelectPostsAndCategoryBy: `SELECT posts.id, posts.title, posts.body, posts.user, src_users.login, posts.created
+		constant.QueSelectPostsAndCategoryBy: `SELECT posts.id, posts.title, posts.body, posts.user, src_users.name, posts.created
 		FROM		posts
 		LEFT JOIN	src_users ON src_users.id = posts.user
 		LEFT JOIN	posts_categories ON posts.id = posts_categories.post

@@ -9,6 +9,7 @@ import (
 type User struct {
 	ID       int
 	Login    string
+	Name     string
 	Password string
 	Email    string
 	Root     int
@@ -50,6 +51,7 @@ func (u *User) New() []interface{} {
 	return []interface{}{
 		&u.ID,
 		&u.Login,
+		&u.Name,
 		&u.Password,
 		&u.Email,
 		&u.Root,

@@ -6,12 +6,8 @@ import (
 )
 
 type CheckID struct {
-	Slice []*Who
-	Obj   object.Obj
-}
-
-type Who struct {
-	ID int
+	ID  int
+	Obj object.Obj
 }
 
 func NewCheckID(st *object.Settings, sts *object.Statuses, ck *object.Cookie) *CheckID {
@@ -28,7 +24,7 @@ func (c *CheckID) MakeKeys(key string, data ...interface{}) {
 	}
 }
 
-func (c *CheckID) GetList() *object.QuerySettings {
+func (c *CheckID) Get() *object.QuerySettings {
 	qs := new(object.QuerySettings)
 	qs.QueryName = constant.QueSelect
 	if value, ok := c.Obj.St.Key[constant.KeyPost]; ok {
@@ -54,19 +50,36 @@ func (c *CheckID) GetList() *object.QuerySettings {
 		} else {
 			qs.Fields = value
 		}
+	} else if value, ok := c.Obj.St.Key[constant.KeyComment]; ok {
+		qs.QueryName = constant.QueSelect
+		qs.QueryFields = []interface{}{
+			constant.TabComments,
+			constant.TabComments,
+			constant.FieldID,
+		}
+		if value == nil {
+			qs.Fields = []interface{}{0}
+		} else {
+			qs.Fields = value
+		}
+	} else if value, ok := c.Obj.St.Key[constant.KeyLogin]; ok {
+		qs.QueryName = constant.QueSelect
+		qs.QueryFields = []interface{}{
+			constant.TabUsers,
+			constant.TabUsers,
+			constant.FieldLogin,
+		}
+		if value == nil {
+			qs.Fields = []interface{}{0}
+		} else {
+			qs.Fields = value
+		}
 	}
 	return qs
 }
 
-func (c *CheckID) NewList() []interface{} {
-	who := new(Who)
-	c.Slice = append(c.Slice, who)
-	// for account handler
+func (c *CheckID) New() []interface{} {
 	return []interface{}{
-		&who.ID,
+		&c.ID,
 	}
-}
-
-func (c *CheckID) Return() *Buf {
-	return &Buf{CheckID: c}
 }

@@ -11,7 +11,7 @@ type Post struct {
 	Title      string
 	Body       string
 	User       int
-	Login      string
+	Name       string
 	Created    time.Time
 	Categories interface{}
 	Likes      interface{}
@@ -67,7 +67,7 @@ func (p *Post) New() []interface{} {
 		&p.Title,
 		&p.Body,
 		&p.User,
-		&p.Login,
+		&p.Name,
 		&p.Created,
 	}
 }
@@ -82,6 +82,6 @@ func (p *Post) ifNil() *Post {
 		Body:    "sorry, empty here",
 		Created: time.Now(),
 		User:    1,
-		Login:   "Admin",
+		Name:    "Admin",
 	}
 }

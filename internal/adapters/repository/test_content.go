@@ -31,18 +31,19 @@ func (li *LoremIpsum) Run(db *sql.DB, q *object.Query) {
 }
 
 func (li *LoremIpsum) tUsers(db *sql.DB, q *object.Query) {
-	que := fmt.Sprintf(q.Schema[constant.QueInsert4], constant.TabUsers,
-		constant.FieldLogin, constant.FieldPassword, constant.FieldEmail, constant.FieldCreated)
+	que := fmt.Sprintf(q.Schema[constant.QueInsert5], constant.TabUsers,
+		constant.FieldLogin, constant.FieldName, constant.FieldPassword, constant.FieldEmail, constant.FieldCreated)
 	pass, _ := bcrypt.GenerateFromPassword([]byte("12345Aa"), bcrypt.MinCost)
-	db.Exec(que, "blackbeard", string(pass), "user2@mail.ru", time.Now())
-	db.Exec(que, "sir francis drake", string(pass), "user3@mail.ru", time.Now())
-	db.Exec(que, "captain samuel bellamy", string(pass), "user4@mail.ru", time.Now())
-	db.Exec(que, "ching shih", string(pass), "user5@mail.ru", time.Now())
-	db.Exec(que, "bartholomew roberts", string(pass), "user6@mail.ru", time.Now())
-	db.Exec(que, "captain kidd", string(pass), "user7@mail.ru", time.Now())
-	db.Exec(que, "henry morgan", string(pass), "user8@mail.ru", time.Now())
-	db.Exec(que, "calico jack", string(pass), "user9@mail.ru", time.Now())
-	db.Exec(que, "the barbarossa", string(pass), "user10@mail.ru", time.Now())
+	sPass := string(pass)
+	db.Exec(que, "blackbeard", "Blackbeard", sPass, "user2@mail.ru", time.Now())
+	db.Exec(que, "francis_drake", "sir Francis Drake", sPass, "user3@mail.ru", time.Now())
+	db.Exec(que, "samuel_bellamy", "captain Samuel Bellamy", sPass, "user4@mail.ru", time.Now())
+	db.Exec(que, "ching_shih", "Ching Shih", sPass, "user5@mail.ru", time.Now())
+	db.Exec(que, "bartholomew_roberts", "Bartholomew Roberts", sPass, "user6@mail.ru", time.Now())
+	db.Exec(que, "kidd", "captain Kidd", sPass, "user7@mail.ru", time.Now())
+	db.Exec(que, "henry_morgan", "Henry Morgan", sPass, "user8@mail.ru", time.Now())
+	db.Exec(que, "calico_jack", "Calico Jack", sPass, "user9@mail.ru", time.Now())
+	db.Exec(que, "barbarossa", "the Barbarossa", sPass, "user10@mail.ru", time.Now())
 	// and admin
 
 	queCount := fmt.Sprintf(q.Schema[constant.QueSelectCount], constant.TabUsers)

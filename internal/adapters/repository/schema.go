@@ -10,6 +10,7 @@ type Configuration struct {
 	Driver, Port, Connection string
 }
 
+// MakeTables returns a list of tables that need to create
 func MakeTables() []string {
 	return []string{
 		constant.TabUsers,
@@ -20,5 +21,7 @@ func MakeTables() []string {
 		constant.TabPostsCategories,
 		constant.TabComments,
 		constant.TabCommentsLikes,
-		constant.TabSessions}
+		constant.TabSessions,
+		constant.TabTokens,
+	}
 }

@@ -93,7 +93,7 @@ func (c *Comments) NewList() []interface{} {
 	if _, ok := c.St.Key[constant.KeyRated]; ok {
 		return []interface{}{
 			&comment.ID,
-			&comment.Login,
+			&comment.Name,
 			&comment.Body,
 			&comment.Created,
 			&comment.Post,
@@ -106,7 +106,7 @@ func (c *Comments) NewList() []interface{} {
 	}
 	return []interface{}{
 		&comment.ID,
-		&comment.Login,
+		&comment.Name,
 		&comment.Body,
 		&comment.Created,
 		&comment.Post,

@@ -31,16 +31,16 @@ func NewService(repo repository.Repo, sCategory service.Category,
 func (sp *sPost) Create(ctx context.Context, d *dto.Post) (int, object.Status) {
 	ctx2, cancel := context.WithTimeout(ctx, constant.TimeLimitDB)
 	defer cancel()
-
+	lCat := len(d.Categories.Slice)
 	// check valid categories
-	if len(d.Categories.Slice) > 0 {
-		categories := dto.NewCheckID(constant.KeyCategory, d.Categories.Slice)
-		ids, sts := sp.sMiddleware.CheckID(ctx, categories)
-		if sts != nil {
-			return 0, sts
-		}
-		if ids != nil {
-			d.Categories.ID = ids
+	if lCat > 0 {
+		for i := 0; i < lCat; i++ {
+			categories := dto.NewCheckIDAtoi(constant.KeyCategory, d.Categories.Slice[i])
+			idWho, sts := sp.sMiddleware.GetID(ctx, categories)
+			if sts != nil {
+				return 0, sts
+			}
+			d.Categories.ID = append(d.Categories.ID, idWho)
 		}
 	}
 	// create post
@@ -50,8 +50,9 @@ func (sp *sPost) Create(ctx context.Context, d *dto.Post) (int, object.Status) {
 	}
 	// remember id new created post
 	d.Categories.Post = id
-	if lSlice := len(d.Categories.ID); lSlice != 0 {
-		for i := 0; i < lSlice; i++ {
+	// create categories for post
+	if lCat != 0 {
+		for i := 0; i < lCat; i++ {
 			// current id category to add
 			d.Categories.Category = d.Categories.ID[i]
 			// create category

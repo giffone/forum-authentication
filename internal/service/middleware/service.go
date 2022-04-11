@@ -53,26 +53,30 @@ func (smw *sMiddleware) CheckSession(ctx context.Context, d *dto.Session) (inter
 	return session, sts
 }
 
-func (smw *sMiddleware) CheckID(ctx context.Context, d *dto.CheckID) ([]int, object.Status) {
-	var ids []int
-	for i := 0; i < len(d.ID); i++ {
-		id, err := strconv.Atoi(d.ID[i])
-		if err != nil {
-			return nil, object.StatusByCodeAndLog(constant.Code400,
+func (smw *sMiddleware) GetID(ctx context.Context, d *dto.CheckID) (int, object.Status) {
+	var value interface{}
+	if d.Atoi {
+		if d.IDString == "" {
+			return 0, object.StatusByCodeAndLog(constant.Code500,
+				nil, "check id: atoi = true, but IDString empty")
+		}
+		idInt, err := strconv.Atoi(d.IDString)
+		if err != nil || idInt == 0 {
+			return 0, object.StatusByCodeAndLog(constant.Code400,
 				err, "check id: atoi")
 		}
-		who := model.NewCheckID(nil, nil, nil)
-		who.MakeKeys(d.Who, id)
-
-		sts := smw.repo.GetList(ctx, who)
-		if sts != nil {
-			return nil, sts
-		}
-		if len(who.Slice) == 0 {
-			return nil, object.StatusByCode(constant.Code400)
-		}
-		ids = append(ids, id)
+		value = idInt
+	} else {
+		value = d.ID
 	}
-	return ids, nil
-	// be careful send []int=nil without sts with error, will panic!
+	who := model.NewCheckID(nil, nil, nil)
+	who.MakeKeys(d.Who, value)
+	sts := smw.repo.GetOne(ctx, who)
+	if sts != nil {
+		return 0, sts
+	}
+	if who.ID == 0 {
+		return 0, object.StatusByCode(constant.Code400)
+	}
+	return who.ID, nil
 }

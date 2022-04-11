@@ -498,6 +498,11 @@ h4 {
     font-weight: bold;
 }
 
+h5 {
+    font-size: .8em;
+    font-weight: bold;
+}
+
 @media (max-width:1024px) {
     .wrapper-main {
         display: block;

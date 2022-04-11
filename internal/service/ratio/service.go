@@ -33,7 +33,7 @@ func (sr *sRatio) Create(ctx context.Context, d *dto.Ratio) (int, object.Status)
 	if id, ok := d.PostOrComm[constant.KeyPost]; ok {
 		post = true
 		// check id for valid
-		idPost, sts := sr.checkID(ctx2, constant.KeyPost, []string{id})
+		idPost, sts := sr.sMiddleware.GetID(ctx2, dto.NewCheckIDAtoi(constant.KeyPost, id))
 		if sts != nil {
 			return 0, sts
 		}
@@ -44,10 +44,11 @@ func (sr *sRatio) Create(ctx context.Context, d *dto.Ratio) (int, object.Status)
 		// comment
 	} else if id, ok := d.PostOrComm[constant.KeyComment]; ok {
 		// check id for valid
-		idComm, sts := sr.checkID(ctx2, constant.KeyComment, []string{id})
+		idComm, sts := sr.sMiddleware.GetID(ctx2, dto.NewCheckIDAtoi(constant.KeyComment, id))
 		if sts != nil {
 			return 0, sts
 		}
+		log.Printf("id is %v", idComm)
 		ratio.MakeKeys(constant.KeyComment, d.Obj.Ck.User, idComm)
 		// comment - keys for create like in db
 		d.MakeKeys(constant.KeyComment, d.Obj.Ck.User, idComm)
@@ -191,13 +192,4 @@ func (sr *sRatio) LikedChan(ctx context.Context, pc model.PostOrComment, channel
 	}
 	log.Println("out LikedChan")
 	channel <- nil
-}
-
-func (sr *sRatio) checkID(ctx context.Context, postOrComm string, slice []string) (int, object.Status) {
-	id := dto.NewCheckID(postOrComm, slice)
-	ids, sts := sr.sMiddleware.CheckID(ctx, id)
-	if sts != nil {
-		return 0, sts
-	}
-	return ids[0], nil
 }

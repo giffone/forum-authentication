@@ -5,8 +5,8 @@
 {{define "one_post_title"}}
     <div class="title">
         <a href="/read/?post={{.ID}}" class="title-main"><h3>{{.Title}}</h3></a>
-        {{if ne .Login ""}}
-            <div><b>{{.Login}}</b>{{.Created | dateForum | printf " on %s" }}</div>
+        {{if ne .Name ""}}
+            <div><b>{{.Name}}</b>{{.Created | dateForum | printf " on %s" }}</div>
         {{else}}
             <p>&nbsp;</p>
         {{end}}
