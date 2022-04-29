@@ -38,6 +38,8 @@ func (ha *hAuth) Register(ctx context.Context, router *http.ServeMux, s api.Midd
 	router.HandleFunc(constant.URLLoginGithubCallback, s.Skip(ctx, ha.loginGithubCallback))
 	router.HandleFunc(constant.URLLoginFacebook, ha.loginFacebook)
 	router.HandleFunc(constant.URLLoginFacebookCallback, s.Skip(ctx, ha.loginFacebookCallback))
+	router.HandleFunc(constant.URLLoginGoogle, ha.loginGoogle)
+	router.HandleFunc(constant.URLLoginGoogleCallback, s.Skip(ctx, ha.loginGoogleCallback))
 }
 
 type social struct {
@@ -66,7 +68,7 @@ func (ha *hAuth) login(w http.ResponseWriter, r *http.Request, sc social) {
 	}
 	urlBuf.WriteString(u.Encode())
 	urlStr := urlBuf.String()
-	log.Printf("url is %s", urlStr)
+	log.Printf("url is %s", urlStr) //////////////////////////////////// delete
 	http.Redirect(w, r, urlStr, constant.Code301)
 }
 
@@ -96,7 +98,8 @@ func (ha *hAuth) callback(ctx context.Context, ses api.Middleware,
 	log.Printf("token is %s", token)
 
 	var data []byte
-	if sc.name == constant.KeyFacebook {
+	if sc.name == constant.KeyFacebook || sc.name == constant.KeyGoogle {
+		// method, where token adding to url "&access_token=......"
 		sc.userURL += url.QueryEscape(token)
 		data, sts = getFacebookData(sc.userURL)
 		if sts != nil {
@@ -104,12 +107,14 @@ func (ha *hAuth) callback(ctx context.Context, ses api.Middleware,
 			return
 		}
 	} else if sc.name == constant.KeyGithub {
+		// method, where token adding to request basic auth
 		data, sts = getGithubData(sc, token)
 		if sts != nil {
 			api.Message(w, sts)
 			return
 		}
 	} else {
+		// method, where token adding to request header
 		data, sts = getData(sc, token)
 		if sts != nil {
 			api.Message(w, sts)
@@ -157,13 +162,15 @@ func (ha *hAuth) callback(ctx context.Context, ses api.Middleware,
 	// create user in database
 	id, sts := ha.sUser.Create(ctx, user)
 	if sts != nil {
-		// checks login already registered
-		login := dto.NewCheckID(constant.KeyLogin, user.Login)
-		idWho, sts1 := ha.sMiddleware.GetID(ctx, login)
+		// checks email already registered
+		email := dto.NewCheckID(constant.KeyEmail, user.Email)
+		log.Printf("creating, email is %s", user.Email)
+		idWho, sts1 := ha.sMiddleware.GetID(ctx, email)
 		if sts1 != nil {
-			// checks email already registered
-			email := dto.NewCheckID(constant.KeyEmail, user.Email)
-			idWho1, sts2 := ha.sMiddleware.GetID(ctx, email)
+			// checks login already registered
+			login := dto.NewCheckID(constant.KeyLogin, user.Login)
+			log.Printf("creating, login is %s", user.Login)
+			idWho1, sts2 := ha.sMiddleware.GetID(ctx, login)
 			if sts2 != nil {
 				api.Message(w, sts2)
 				return

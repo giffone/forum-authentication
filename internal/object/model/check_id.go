@@ -74,6 +74,18 @@ func (c *CheckID) Get() *object.QuerySettings {
 		} else {
 			qs.Fields = value
 		}
+	} else if value, ok := c.Obj.St.Key[constant.KeyEmail]; ok {
+		qs.QueryName = constant.QueSelect
+		qs.QueryFields = []interface{}{
+			constant.TabUsers,
+			constant.TabUsers,
+			constant.FieldEmail,
+		}
+		if value == nil {
+			qs.Fields = []interface{}{0}
+		} else {
+			qs.Fields = value
+		}
 	}
 	return qs
 }

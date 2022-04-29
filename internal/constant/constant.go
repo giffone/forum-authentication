@@ -36,6 +36,7 @@ const (
 	FacebookUserURL  = "https://graph.facebook.com/me?fields=id,name,email&access_token="
 	GoogleAuthURL    = "https://accounts.google.com/o/oauth2/auth"
 	GoogleTokenURL   = "https://oauth2.googleapis.com/token"
+	GoogleUserURL    = "https://www.googleapis.com/oauth2/v3/userinfo?access_token="
 
 	/*------------------------------------------------------*/
 

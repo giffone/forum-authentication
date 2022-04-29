@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/giffone/forum-authentication/internal/adapters/authentication"
+	"github.com/giffone/forum-authentication/internal/adapters/repository"
 	"github.com/giffone/forum-authentication/internal/constant"
 	"net/http"
 )
@@ -43,8 +44,8 @@ func (a *App) Run(driver string) (*sql.DB, *http.ServeMux, string) {
 	a.router.Handle("/assets/", dirHandler)
 
 	// FOR TEST ONLY
-	//_, _, schema := repo.ExportSettings()
-	//repository.NewLoremIpsum().Run(db, schema)
+	_, _, schema := repo.ExportSettings()
+	repository.NewLoremIpsum().Run(db, schema)
 	// FOR TEST ONLY
 
 	return db, a.router, port

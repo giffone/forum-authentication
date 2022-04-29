@@ -14,7 +14,8 @@ import (
 )
 
 type User struct {
-	Id         any    `json:"id"` // (not exported) only for authentication from social network
+	IdSub      any    `json:"sub"` // for google id
+	Id         any    `json:"id"`  // (not exported) only for authentication from social network
 	Login      string `json:"login"`
 	Name       string `json:"name"`
 	Password   string
@@ -56,7 +57,11 @@ func (u *User) AddJSON(data []byte) error {
 		if u.Email != "" {
 			u.Login = u.Email
 		} else {
-			u.Login = fmt.Sprintf("login_%s", u.Id)
+			if u.Id == nil {
+				u.Login = fmt.Sprintf("login_%s", u.IdSub)
+			} else {
+				u.Login = fmt.Sprintf("login_%s", u.Id)
+			}
 		}
 	}
 	if u.Name == "" {
