@@ -1,5 +1,7 @@
 ## forum: version authentication
 
+forum based on: "basic forum" + "authentication"
+
 In this version:
 
 - authentication third-part by `Google`,`Github` or `Facebook`.
